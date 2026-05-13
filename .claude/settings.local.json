@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(~/.claude/skills/scaffold-monorepo/**)",
+      "Bash(pnpm add *)",
+      "Bash(where pnpm *)",
+      "Bash(npm list *)",
+      "PowerShell(pnpm --version)",
+      "Bash(Get-ChildItem apps *)",
+      "Bash(Select-Object -First 60)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
