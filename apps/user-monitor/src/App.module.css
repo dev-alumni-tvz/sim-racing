@@ -1,0 +1,151 @@
+.page {
+  width: 1440px;
+  min-height: 2560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-bottom: 48px;
+}
+
+/* ---- Header ---- */
+.header {
+  position: relative;
+  height: 280px;
+  background: #010416;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.headerGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.glow1 {
+  position: absolute;
+  width: 600px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(106,200,255,0.25) 0%, transparent 70%);
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.glow2 {
+  position: absolute;
+  width: 400px;
+  height: 200px;
+  background: radial-gradient(ellipse, rgba(0,66,136,0.6) 0%, transparent 70%);
+  bottom: 0;
+  left: 20%;
+}
+
+.glow3 {
+  position: absolute;
+  width: 300px;
+  height: 150px;
+  background: radial-gradient(ellipse, rgba(0,116,241,0.4) 0%, transparent 70%);
+  bottom: 0;
+  right: 20%;
+}
+
+.headerMeta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.poweredBy {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  font-size: 24px;
+  color: #ffffff;
+}
+
+.headerSub {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  font-size: 15px;
+  color: rgba(255,255,255,0.8);
+}
+
+/* ---- Podium ---- */
+.podiumSection {
+  padding: 0 48px;
+}
+
+.sectionTitle {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--color-text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 20px;
+}
+
+/* ---- Queue countdown ---- */
+.countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 74px;
+  background: var(--color-card);
+  margin: 0 48px;
+  border-radius: 8px;
+  padding: 0 24px;
+}
+
+.countdownLabel {
+  font-family: var(--font-label);
+  font-weight: 400;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.countdownTime {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+/* ---- Currently Driving ---- */
+.drivingSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 0 48px;
+}
+
+/* ---- Leaderboard ---- */
+.leaderboardSection {
+  padding: 0 48px;
+}
+
+/* ---- Queue grid ---- */
+.queueSection {
+  padding: 0 48px;
+}
+
+/* ---- Footer ---- */
+.footer {
+  text-align: center;
+  padding: 32px 48px;
+  border-top: 1px solid var(--color-divider);
+  font-family: var(--font-label);
+  font-weight: 400;
+  font-size: 16px;
+  color: #ffffff;
+}

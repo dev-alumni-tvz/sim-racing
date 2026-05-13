@@ -1,0 +1,21 @@
+@import '@sim-racing/ui/tokens.css';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--color-bg);
+  color: var(--color-text-soft);
+  font-family: var(--font-ui);
+  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
