@@ -94,6 +94,19 @@ Buy one domain → 3 subdomains:
 - User can cancel their queue spot
 - Queue shows: slot number, estimated wait time
 
+## Asset Folders
+
+Each app has two asset locations:
+
+```
+apps/<app>/
+├── public/        ← static files served as-is; reference as /image.png in CSS/HTML
+└── src/assets/   ← images imported in components (Vite hashes and bundles these)
+```
+
+Use `public/` for backgrounds, logos, and favicons referenced in CSS or `<img src>`.
+Use `src/assets/` when importing images directly in TypeScript components.
+
 ## Figma Integration
 
 Figma MCP is configured in `~/.claude/.mcp.json`. Claude Code can read Figma designs directly — paste a Figma file URL and Claude will extract colors, spacing, and component layouts.

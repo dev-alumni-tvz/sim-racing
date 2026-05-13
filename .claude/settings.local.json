@@ -9,7 +9,11 @@
       "Bash(Get-ChildItem apps *)",
       "Bash(Select-Object -First 60)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(mkdir -p apps/__TRACKED_VAR__/public apps/__TRACKED_VAR__/src/assets)",
+      "Bash(touch apps/__TRACKED_VAR__/public/.gitkeep apps/__TRACKED_VAR__/src/assets/.gitkeep)",
+      "Bash(pnpm --filter @sim-racing/ui typecheck)",
+      "Bash(pnpm --filter user-web typecheck)"
     ]
   }
 }
