@@ -1,97 +1,109 @@
 .row {
-  display: grid;
-  grid-template-columns: 52px 1fr 110px 90px;
-  align-items: center;
-  background: var(--color-card);
-  border-bottom: 1px solid var(--color-divider);
-  padding: 0 12px;
-  height: 37px;
-  box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 36px 1fr 72px 90px;
+    align-items: center;
+    background: var(--color-card);
+    border-bottom: 1px solid var(--color-divider);
+    padding: 0 12px;
+    height: 37px;
+    box-sizing: border-box;
+    border-radius: 12px;
 }
 
 .rowLg {
-  height: 70px;
+    height: 70px;
 }
 
-.rowTop3 {
-  background: var(--gradient-top3);
+/* Per-rank gradients */
+.rowRank1 {
+    background: linear-gradient(90deg, #FFD365 0%, #0F131D 100%);
+}
+
+.rowRank2 {
+    background: linear-gradient(90deg, #CDCDCD 0%, #0E0F15 100%);
+}
+
+.rowRank3 {
+    background: linear-gradient(90deg, #B38A48 0%, #0E0F15 100%);
+}
+
+/* pos + name dark on gradient; gap + lapTime stay white */
+.rowTop3 .pos,
+.rowTop3 .name {
+    color: #0e0f15;
+}
+
+.rowTop3 .gap,
+.rowTop3 .lapTime {
+    color: var(--color-text-soft);
 }
 
 .pos {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--color-text-muted);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--color-text-muted);
 }
 
 .rowLg .pos {
-  font-size: 24px;
-}
-
-.rowTop3 .pos {
-  color: #0e0f15;
+    font-size: 24px;
 }
 
 .name {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--color-text-soft);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding-right: 8px;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--color-text-soft);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 8px;
 }
 
 .rowLg .name {
-  font-size: 24px;
-}
-
-.rowTop3 .name {
-  color: #0e0f15;
-}
-
-.lapTime {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 12px;
-  color: var(--color-text-soft);
-  text-align: right;
-}
-
-.rowLg .lapTime {
-  font-size: 20px;
-}
-
-.rowTop3 .lapTime {
-  color: #0e0f15;
+    font-size: 24px;
 }
 
 .gap {
-  font-family: var(--font-ui);
-  font-weight: 300;
-  font-size: 12px;
-  color: var(--color-error);
-  text-align: right;
+    font-family: var(--font-ui);
+    font-weight: 300;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    text-align: right;
+    opacity: 0.8;
 }
 
 .rowLg .gap {
-  font-size: 16px;
+    font-size: 16px;
 }
 
-.rowTop3 .gap {
-  color: #0e0f15;
+.lapTime {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text-soft);
+    text-align: right;
 }
 
-/* Mobile overrides: DM Sans instead of Titillium Web */
+.rowLg .lapTime {
+    font-size: 20px;
+}
+
+/* Mobile: DM Sans only for pos + name; gap + lapTime stay Titillium Web */
 .mobile .pos,
 .mobile .name {
-  font-family: var(--font-mobile);
-  font-size: 14px;
+    font-family: var(--font-mobile);
+    font-size: 14px;
 }
 
-.mobile .lapTime,
 .mobile .gap {
-  font-family: var(--font-mobile);
-  font-size: 14px;
+    font-family: var(--font-ui);
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.mobile .lapTime {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 16px;
 }

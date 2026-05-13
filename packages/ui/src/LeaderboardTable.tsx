@@ -18,10 +18,6 @@ export const LeaderboardTable: FC<LeaderboardTableProps> = ({
   useDmSans = false,
   maxHeight,
 }) => {
-  const headerClass = [styles.header, size === 'lg' ? styles.headerLg : '']
-    .filter(Boolean)
-    .join(' ')
-
   const renderRows = (items: typeof rows) =>
     items.map((row) => (
       <LeaderboardRow key={row.position} {...row} size={size} useDmSans={useDmSans} />
@@ -29,12 +25,6 @@ export const LeaderboardTable: FC<LeaderboardTableProps> = ({
 
   return (
     <div className={styles.wrapper}>
-      <div className={headerClass}>
-        <span className={styles.headerCol}>Pos.</span>
-        <span className={styles.headerCol}>Name</span>
-        <span className={styles.headerCol}>Lap Time</span>
-        <span className={styles.headerCol}>Gap</span>
-      </div>
 
       {columns === 2 ? (
         <div className={styles.twoCol}>

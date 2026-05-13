@@ -2,30 +2,6 @@
   width: 100%;
 }
 
-.header {
-  display: grid;
-  grid-template-columns: 52px 1fr 110px 90px;
-  padding: 0 12px;
-  height: 32px;
-  align-items: center;
-}
-
-.headerLg {
-  height: 40px;
-}
-
-.headerCol {
-  font-family: var(--font-label);
-  font-weight: 400;
-  font-size: 14px;
-  color: var(--color-text-primary);
-}
-
-.headerCol:nth-child(3),
-.headerCol:nth-child(4) {
-  text-align: right;
-}
-
 /* Two-column layout for user-monitor */
 .twoCol {
   display: grid;
@@ -36,12 +12,14 @@
 .twoCol .column {
   display: flex;
   flex-direction: column;
+  gap: 5px;
 }
 
 /* Single-column layout (default) */
 .oneCol {
   display: flex;
   flex-direction: column;
+  gap: 5px;
 }
 
 /* Scrollable container */
