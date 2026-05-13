@@ -1,0 +1,91 @@
+/* ---- List mode (admin panel queue rows) ---- */
+.list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.listRow {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  align-items: center;
+  height: 37px;
+  background: var(--color-card);
+  border-bottom: 1px solid var(--color-divider);
+  padding: 0 12px;
+  gap: 12px;
+}
+
+.listQueueNum {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--color-queue-col);
+}
+
+.listName {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Grid mode (user-monitor queue tiles) ---- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(184px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.tile {
+  width: 184px;
+  height: 184px;
+  background: var(--color-card);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tileNumber {
+  font-family: var(--font-number);
+  font-weight: 800;
+  font-size: 48px;
+  color: var(--color-text-dim);
+}
+
+/* Info tiles (New Slots / Free Slots) */
+.infoTile {
+  width: 184px;
+  height: 184px;
+  background: var(--gradient-tile);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  gap: 8px;
+}
+
+.infoTileLabel {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+}
+
+.infoTileValue {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--color-text-soft);
+}

@@ -1,0 +1,65 @@
+.wrapper {
+  width: 100%;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 52px 1fr 110px 90px;
+  padding: 0 12px;
+  height: 32px;
+  align-items: center;
+}
+
+.headerLg {
+  height: 40px;
+}
+
+.headerCol {
+  font-family: var(--font-label);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.headerCol:nth-child(3),
+.headerCol:nth-child(4) {
+  text-align: right;
+}
+
+/* Two-column layout for user-monitor */
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+}
+
+.twoCol .column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Single-column layout (default) */
+.oneCol {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollable container */
+.scrollable {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar) var(--color-divider);
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: var(--color-divider);
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar);
+  border-radius: 3px;
+}

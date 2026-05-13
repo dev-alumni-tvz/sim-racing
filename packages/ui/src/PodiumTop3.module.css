@@ -1,0 +1,93 @@
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 24px 16px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(14,15,21,0) 0%, rgba(14,15,21,0.85) 100%),
+              var(--color-card);
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.first {
+  width: 353px;
+  height: 587px;
+  order: 2;
+}
+
+.second {
+  width: 353px;
+  height: 575px;
+  order: 1;
+}
+
+.third {
+  width: 353px;
+  height: 575px;
+  order: 3;
+}
+
+.avatarRing {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.05);
+}
+
+.first .avatarRing  { border-color: #ffd365; }
+.second .avatarRing { border-color: #cdcdcd; }
+.third .avatarRing  { border-color: #b38a48; }
+
+.placeLabel {
+  font-family: var(--font-label);
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.playerName {
+  font-family: var(--font-label);
+  font-weight: 600;
+  font-size: 24px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.lapTimeLabel {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+}
+
+.lapTime {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 36px;
+  background: linear-gradient(90deg, #6ac8ff, #0084ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gap {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--color-error);
+}

@@ -1,0 +1,97 @@
+.row {
+  display: grid;
+  grid-template-columns: 52px 1fr 110px 90px;
+  align-items: center;
+  background: var(--color-card);
+  border-bottom: 1px solid var(--color-divider);
+  padding: 0 12px;
+  height: 37px;
+  box-sizing: border-box;
+}
+
+.rowLg {
+  height: 70px;
+}
+
+.rowTop3 {
+  background: var(--gradient-top3);
+}
+
+.pos {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.rowLg .pos {
+  font-size: 24px;
+}
+
+.rowTop3 .pos {
+  color: #0e0f15;
+}
+
+.name {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+.rowLg .name {
+  font-size: 24px;
+}
+
+.rowTop3 .name {
+  color: #0e0f15;
+}
+
+.lapTime {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--color-text-soft);
+  text-align: right;
+}
+
+.rowLg .lapTime {
+  font-size: 20px;
+}
+
+.rowTop3 .lapTime {
+  color: #0e0f15;
+}
+
+.gap {
+  font-family: var(--font-ui);
+  font-weight: 300;
+  font-size: 12px;
+  color: var(--color-error);
+  text-align: right;
+}
+
+.rowLg .gap {
+  font-size: 16px;
+}
+
+.rowTop3 .gap {
+  color: #0e0f15;
+}
+
+/* Mobile overrides: DM Sans instead of Titillium Web */
+.mobile .pos,
+.mobile .name {
+  font-family: var(--font-mobile);
+  font-size: 14px;
+}
+
+.mobile .lapTime,
+.mobile .gap {
+  font-family: var(--font-mobile);
+  font-size: 14px;
+}

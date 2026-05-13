@@ -1,0 +1,49 @@
+:root {
+  /* Backgrounds */
+  --color-bg: #0e0f15;
+  --color-card: #0f131d;
+  --color-card-alt: #182a56;
+
+  /* Accents */
+  --color-glow-blue: #6ac8ff;
+  --color-deep-blue: #004288;
+  --color-mid-blue: #0074f1;
+
+  /* Interactive */
+  --color-btn-primary: #0084ff;
+  --color-btn-dark: #1e4286;
+  --color-btn-green: #2e9d06;
+  --color-btn-red: #bd0606;
+  --color-btn-danger: #d22525;
+  --color-cta-yellow: #eac31b;
+
+  /* Text */
+  --color-text-primary: #ffffff;
+  --color-text-soft: #eef6fa;
+  --color-text-muted: #81a1c0;
+  --color-text-dim: #354a69;
+  --color-text-placeholder: #6b7280;
+  --color-text-label: #314977;
+  --color-queue-col: #253759;
+
+  /* Feedback */
+  --color-error: #ff4a4a;
+
+  /* Borders / Dividers */
+  --color-divider: #23293b;
+  --color-border-dark: #16204b;
+  --color-border-panel: #5b65a7;
+  --color-scrollbar: #536694;
+
+  /* Gradients */
+  --gradient-top3: linear-gradient(90deg, #b07813 0%, #d4973a 100%);
+  --gradient-card-blue: linear-gradient(135deg, #0074f1 0%, #004288 100%);
+  --gradient-tile: linear-gradient(135deg, #0074f1 0%, #004288 100%);
+
+  /* Font stacks */
+  --font-ui: 'Titillium Web', sans-serif;
+  --font-mobile: 'DM Sans', sans-serif;
+  --font-number: 'TASA Orbiter Display', monospace;
+  --font-label: 'Inter', sans-serif;
+  --font-brand: 'Poppins', sans-serif;
+}

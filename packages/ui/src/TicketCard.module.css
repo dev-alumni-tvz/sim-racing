@@ -1,0 +1,41 @@
+.ticket {
+  background: var(--gradient-card-blue);
+  border-radius: 12px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 240px;
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 14px;
+  color: rgba(238, 246, 250, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.number {
+  font-family: var(--font-number);
+  font-weight: 800;
+  font-size: 80px;
+  color: var(--color-text-soft);
+  line-height: 1;
+}
+
+.name {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--color-text-soft);
+}
+
+.wait {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}

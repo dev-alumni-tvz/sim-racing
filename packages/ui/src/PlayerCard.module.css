@@ -1,0 +1,54 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--gradient-card-blue);
+  border-radius: 8px;
+}
+
+.current {
+  width: 299px;
+  height: 299px;
+}
+
+.next,
+.previous {
+  width: 230px;
+  height: 230px;
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--color-text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.number {
+  font-family: var(--font-number);
+  font-weight: 800;
+  color: var(--color-text-soft);
+  line-height: 1;
+}
+
+.current .number {
+  font-size: 110px;
+}
+
+.next .number,
+.previous .number {
+  font-size: 64px;
+}
+
+.name {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-text-soft);
+  text-align: center;
+  padding: 0 12px;
+}
