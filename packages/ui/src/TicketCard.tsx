@@ -11,7 +11,7 @@ export const TicketCard: FC<TicketCardProps> = ({ queueNumber, name, estimatedWa
   return (
     <div className={styles.ticket}>
       <span className={styles.label}>Your queue number</span>
-      <span className={styles.number}>{queueNumber}</span>
+      <span className={styles.number}>{String(queueNumber).padStart(3, '0')}</span>
       <span className={styles.name}>{name}</span>
       <span className={styles.wait}>~{estimatedWaitMinutes} min wait</span>
     </div>
