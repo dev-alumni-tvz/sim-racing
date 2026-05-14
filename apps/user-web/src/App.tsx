@@ -1,35 +1,26 @@
 import { useState } from 'react';
 import styles from './App.module.css';
-import { LeaderboardTable } from '@sim-racing/ui';
+import { LeaderboardTable, TicketCard } from '@sim-racing/ui';
 import { useLeaderboard } from './hooks/useLeaderboard';
-import { useRegistration } from './hooks/useRegistration';
 import type { RegistrationResponse } from '@sim-racing/api-types';
+import { JoinQueueModal } from './components/JoinQueueModal';
 
 export default function App() {
 	const [search, setSearch] = useState('');
+	const [modalOpen, setModalOpen] = useState(false);
 	const [ticket, setTicket] = useState<RegistrationResponse | null>(null);
+	const [ticketName, setTicketName] = useState('');
 
 	const { data: rows = [] } = useLeaderboard();
-	const registration = useRegistration();
 
-	const filtered = search ? rows.filter((r) => r.name.toLowerCase().includes(search.toLowerCase())) : rows;
+	const filtered = search
+		? rows.filter((r) => r.name.toLowerCase().includes(search.toLowerCase()))
+		: rows;
 
-	function handleJoinQueue() {
-		// TODO: open registration form modal
-		registration.mutate(
-			{ firstName: 'Vaše', lastName: 'Ime', email: 'test@example.com' },
-			{
-				onSuccess: (data) => setTicket(data),
-				onError: () => {
-					setTicket({
-						attendeeId: 'demo',
-						ticketNumber: 'SIM-0042',
-						queuePosition: 42,
-						estimatedWaitMinutes: 15,
-					});
-				},
-			},
-		);
+	function handleSuccess(data: RegistrationResponse, firstName: string, lastName: string) {
+		setTicket(data);
+		setTicketName(`${firstName} ${lastName}`);
+		setModalOpen(false);
 	}
 
 	return (
@@ -58,20 +49,25 @@ export default function App() {
 					Prijavi se, odvezi svoj najbolji krug i<br />
 					popni se na leaderboard.
 				</p>
-				<button
-					className={styles.joinBtn}
-					onClick={handleJoinQueue}
-				>
-					Join the Queue
-				</button>
+				{!ticket && (
+					<button
+						className={styles.joinBtn}
+						onClick={() => setModalOpen(true)}
+					>
+						Join the Queue
+					</button>
+				)}
 			</section>
+
 			<div className={styles.heroSeparator} />
+
 			{ticket && (
-				<div className={styles.ticketBanner}>
-					<span className={styles.ticketNum}>{ticket.ticketNumber}</span>
-					<span className={styles.ticketWait}>
-						Pozicija #{ticket.queuePosition} · ~{ticket.estimatedWaitMinutes} min
-					</span>
+				<div className={styles.ticketWrapper}>
+					<TicketCard
+						queueNumber={ticket.queuePosition}
+						name={ticketName}
+						estimatedWaitMinutes={ticket.estimatedWaitMinutes}
+					/>
 				</div>
 			)}
 
@@ -94,6 +90,13 @@ export default function App() {
 				/>
 				<div className={styles.divider} />
 			</section>
+
+			{modalOpen && (
+				<JoinQueueModal
+					onClose={() => setModalOpen(false)}
+					onSuccess={handleSuccess}
+				/>
+			)}
 		</div>
 	);
 }
