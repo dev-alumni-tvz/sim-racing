@@ -3,6 +3,10 @@ import { LeaderboardTable, PlayerCard, PodiumTop3, QueueDisplay } from '@sim-rac
 import { useLeaderboard } from './hooks/useLeaderboard';
 import { useQueueDisplay } from './hooks/useQueueDisplay';
 import { useSignalR } from './hooks/useSignalR';
+import { useSimulation } from './hooks/useSimulation';
+
+const SIM_MODE    = new URLSearchParams(window.location.search).get('sim')    === '1';
+const VISUAL_MODE = new URLSearchParams(window.location.search).get('visual') === '1';
 
 function formatSeconds(s: number): string {
 	const m = Math.floor(s / 60);
@@ -13,11 +17,32 @@ function formatSeconds(s: number): string {
 export default function App() {
 	const { connected } = useSignalR();
 
-	const { data: rows } = useLeaderboard(connected);
-	const { data: queue } = useQueueDisplay(connected);
+	const { data: liveRows } = useLeaderboard(connected && !SIM_MODE, VISUAL_MODE);
+	const { data: liveQueue } = useQueueDisplay(connected && !SIM_MODE, VISUAL_MODE);
+	const { rows: simRows, queue: simQueue } = useSimulation(SIM_MODE);
+
+	const rows = SIM_MODE ? simRows : liveRows;
+	const queue = SIM_MODE ? simQueue : liveQueue;
 
 	const top3 = rows.filter((r) => r.isTop3);
 	const rest = rows.filter((r) => !r.isTop3);
+
+	const EMPTY = { name: '—', lapTime: '--:--.---' };
+	const podiumFirst  = top3[0] ? { name: top3[0].name, lapTime: top3[0].lapTime } : EMPTY;
+	const podiumSecond = top3[1] ? { name: top3[1].name, lapTime: top3[1].lapTime, gap: top3[1].gap ?? undefined } : EMPTY;
+	const podiumThird  = top3[2] ? { name: top3[2].name, lapTime: top3[2].lapTime, gap: top3[2].gap ?? undefined } : EMPTY;
+
+	const MIN_ROWS = 8;
+	const leaderboardRows = rest.length >= MIN_ROWS ? rest : [
+		...rest,
+		...Array.from({ length: MIN_ROWS - rest.length }, (_, i) => ({
+			position: top3.length + rest.length + i + 1,
+			name: '—',
+			lapTime: '--:--.---',
+			gap: null as string | null,
+			isTop3: false,
+		})),
+	];
 
 	return (
 		<div className={styles.page}>
@@ -35,26 +60,22 @@ export default function App() {
 
 			<main className={styles.mainContent}>
 				<section className={styles.podiumSection}>
-					{top3.length === 3 && (
-						<PodiumTop3
-							first={{ name: top3[0].name, lapTime: top3[0].lapTime }}
-							second={{ name: top3[1].name, lapTime: top3[1].lapTime, gap: top3[1].gap ?? undefined }}
-							third={{ name: top3[2].name, lapTime: top3[2].lapTime, gap: top3[2].gap ?? undefined }}
-							queueEndsText={formatSeconds(queue.estimatedWaitSeconds)}
-						/>
-					)}
+					<PodiumTop3
+						first={podiumFirst}
+						second={podiumSecond}
+						third={podiumThird}
+						queueEndsText={formatSeconds(queue.estimatedWaitSeconds)}
+					/>
 					<div className={styles.podiumDivider} />
 				</section>
 
 				<section className={styles.leaderboardSection}>
-					{rest.length > 0 && (
-						<LeaderboardTable
-							rows={rest}
-							columns={2}
-							size="lg"
-							showHeaders
-						/>
-					)}
+					<LeaderboardTable
+						rows={leaderboardRows}
+						columns={2}
+						size="lg"
+						showHeaders
+					/>
 					<p className={styles.leaderboardLink}>
 						View full leaderboard: <span className={styles.leaderboardUrl}>app.sim-cd.com</span>
 					</p>
