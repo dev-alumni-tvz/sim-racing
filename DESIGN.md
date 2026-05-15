@@ -109,7 +109,12 @@ Each card is ~353×575–587px with gradient overlay rectangle
 ```
 [ NEXT UP 230×230 ]  [ CURRENTLY DRIVING 299×299 ]  [ PREVIOUS 230×230 ]
 ```
-- All cards: gradient rectangle background
+| Card | Gradient |
+|---|---|
+| Currently Driving | `linear-gradient(218.57deg, #0471FF 0%, #062A60 93.91%)` |
+| Next Up | `linear-gradient(208.27deg, #EFA767 0%, #934705 95.3%)` |
+| Previous | `linear-gradient(221.71deg, #172437 4.13%, #0F131D 93.39%)` |
+
 - Label: Titillium Web 700/20px `#eef6fa`
 - Queue number (current): TASA Orbiter 800/110px `#eef6fa`
 - Queue number (side): TASA Orbiter 800/64px `#eef6fa`
@@ -124,10 +129,12 @@ Each card is ~353×575–587px with gradient overlay rectangle
 - Gap: Titillium Web 600/20px white / `#eef6fa`
 
 ### Queue Grid
-- Tiles: ~184×184px, bg `#0f131d`
+- Tiles: ~184×184px, bg `rgba(15, 19, 29, 1)` (`--color-card`)
 - Queue number: TASA Orbiter 800/48px `#354a69`
-- **"NEW SLOTS OPEN AT:"** info tile: gradient bg, Titillium Web 700/20px + 32px time value
-- **"FREE SLOTS AVAILABLE:"** info tile: same style
+- **"FREE SLOTS AVAILABLE:"** tile: `linear-gradient(208.27deg, #3FC79F 0%, #009269 95.3%)` — shown when queue has space
+- **"NEW SLOTS OPEN AT:"** tile: `linear-gradient(208.27deg, #B93A3A 0%, #730F0B 95.3%)` — shown only when queue is full (10/10)
+- Info tile label: Titillium Web 700/20px `#eef6fa`
+- Info tile value: Titillium Web 700/32px `#eef6fa`
 
 ### Footer
 - "View full leaderboard: simrig.com" — Inter 400/16px white
