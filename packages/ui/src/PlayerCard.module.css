@@ -1,22 +1,8 @@
-.card {
+.wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: var(--gradient-card-blue);
-  border-radius: 8px;
-}
-
-.current {
-  width: 299px;
-  height: 299px;
-}
-
-.next,
-.previous {
-  width: 230px;
-  height: 230px;
+  gap: 16px;
 }
 
 .label {
@@ -26,6 +12,33 @@
   color: var(--color-text-soft);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 8px;
+}
+
+.current {
+  background: var(--gradient-driving);
+  width: 299px;
+  height: 299px;
+}
+
+.next {
+  background: var(--gradient-next-up);
+  width: 230px;
+  height: 230px;
+}
+
+.previous {
+  background: var(--gradient-previous);
+  width: 230px;
+  height: 230px;
 }
 
 .number {
