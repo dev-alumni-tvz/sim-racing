@@ -1,5 +1,5 @@
 import type { LeaderboardEntry } from './leaderboard'
-import type { CurrentDriver, NextDriver } from './queue'
+import type { QueueDriverInfo } from './queue'
 
 // ---- LeaderboardHub (/hubs/leaderboard) ----
 
@@ -30,8 +30,10 @@ export interface SessionStoppedPayload {
 }
 
 export interface QueueUpdatedPayload {
-  currentDriver: CurrentDriver | null
-  nextDriver: NextDriver | null
+  currentDriver: QueueDriverInfo | null
+  nextDriver: QueueDriverInfo | null
+  previousDriver: QueueDriverInfo | null
+  waitingQueue: QueueDriverInfo[]
   waitingCount: number
 }
 

@@ -1,25 +1,20 @@
 // GET /api/queue/display
-export interface CurrentDriver {
+export interface QueueDriverInfo {
   ticketNumber: string
   firstName: string
-  sessionStartedAt: string
-  /** Snapshot from server — drive the live timer from sessionStartedAt client-side */
-  elapsedSeconds: number
-}
-
-export interface NextDriver {
-  ticketNumber: string
-  firstName: string
-  estimatedWaitMinutes: number
+  lastName: string
 }
 
 export interface QueueDisplayResponse {
-  currentDriver: CurrentDriver | null
-  nextDriver: NextDriver | null
+  currentDriver: QueueDriverInfo | null
+  nextDriver: QueueDriverInfo | null
+  previousDriver: QueueDriverInfo | null
+  waitingQueue: QueueDriverInfo[]
   waitingCount: number
+  estimatedWaitSeconds: number
 }
 
-// GET /api/queue/wait-estimate?position={n}
+// GET /api/queue/wait-estimate
 export interface WaitEstimateResponse {
   estimatedWaitMinutes: number
 }
