@@ -13,19 +13,28 @@ function nextFullHour(): string {
   return `${String(next.getHours()).padStart(2, '0')}:00H`
 }
 
-const PLACEHOLDER: QueueDisplayResponse = {
-  currentDriver:  { ticketNumber: '022', firstName: 'Grobina', lastName: 'Ivković' },
-  nextDriver:     { ticketNumber: '023', firstName: 'Ivan',    lastName: 'Horvat'  },
-  previousDriver: { ticketNumber: '020', firstName: 'Ivan',    lastName: 'Horvat'  },
+const EMPTY_PLACEHOLDER: QueueDisplayResponse = {
+  currentDriver: null,
+  nextDriver: null,
+  previousDriver: null,
+  waitingQueue: [],
+  waitingCount: 0,
+  estimatedWaitSeconds: 0,
+}
+
+const VISUAL_PLACEHOLDER: QueueDisplayResponse = {
+  currentDriver:  { ticketNumber: '022', firstName: 'Grobina', lastName: 'Ivković'  },
+  nextDriver:     { ticketNumber: '023', firstName: 'Ivan',    lastName: 'Horvat'   },
+  previousDriver: { ticketNumber: '020', firstName: 'Ivan',    lastName: 'Horvat'   },
   waitingQueue: [
-    { ticketNumber: '024', firstName: 'Luka',    lastName: 'Babić'     },
-    { ticketNumber: '025', firstName: 'Filip',   lastName: 'Knežević'  },
-    { ticketNumber: '026', firstName: 'Ivana',   lastName: 'Vuković'   },
-    { ticketNumber: '027', firstName: 'Nikola',  lastName: 'Rajković'  },
-    { ticketNumber: '028', firstName: 'Tea',     lastName: 'Živković'  },
-    { ticketNumber: '029', firstName: 'Bruno',   lastName: 'Stanković' },
-    { ticketNumber: '030', firstName: 'Petra',   lastName: 'Novak'     },
-    { ticketNumber: '031', firstName: 'Tomislav',lastName: 'Jurić'     },
+    { ticketNumber: '024', firstName: 'Luka',     lastName: 'Babić'     },
+    { ticketNumber: '025', firstName: 'Filip',    lastName: 'Knežević'  },
+    { ticketNumber: '026', firstName: 'Ivana',    lastName: 'Vuković'   },
+    { ticketNumber: '027', firstName: 'Nikola',   lastName: 'Rajković'  },
+    { ticketNumber: '028', firstName: 'Tea',      lastName: 'Živković'  },
+    { ticketNumber: '029', firstName: 'Bruno',    lastName: 'Stanković' },
+    { ticketNumber: '030', firstName: 'Petra',    lastName: 'Novak'     },
+    { ticketNumber: '031', firstName: 'Tomislav', lastName: 'Jurić'     },
   ],
   waitingCount: 8,
   estimatedWaitSeconds: 0,
@@ -60,10 +69,8 @@ function transform(data: QueueDisplayResponse) {
   }
 }
 
-const INITIAL_QUEUE = transform(PLACEHOLDER)
-
-export function useQueueDisplay(signalRConnected = false) {
-  const lastQueue = useRef(INITIAL_QUEUE)
+export function useQueueDisplay(signalRConnected = false, visualMode = false) {
+  const lastQueue = useRef(transform(visualMode ? VISUAL_PLACEHOLDER : EMPTY_PLACEHOLDER))
 
   const query = useQuery({
     queryKey: ['queueDisplay'],
