@@ -6,18 +6,33 @@ export interface QueuePlayer {
   name: string
 }
 
+export interface QueueSlot {
+  ticketNumber: string
+  firstName: string
+  lastName: string
+}
+
 export interface QueueDisplayProps {
-  players: QueuePlayer[]
+  // list mode (admin-panel)
+  players?: QueuePlayer[]
   showAsGrid?: boolean
-  newSlotsAt?: string
+  // grid mode (user-monitor)
+  waitingQueue?: QueueSlot[]
   freeSlots?: number
+  newSlotsAt?: string
+}
+
+function formatTicket(ticketNumber: string): string {
+  const n = parseInt(ticketNumber.replace(/^[A-Z]+-/, ''), 10)
+  return isNaN(n) ? ticketNumber : String(n).padStart(3, '0')
 }
 
 export const QueueDisplay: FC<QueueDisplayProps> = ({
-  players,
+  players = [],
   showAsGrid = false,
+  waitingQueue = [],
+  freeSlots = 0,
   newSlotsAt,
-  freeSlots,
 }) => {
   if (!showAsGrid) {
     return (
@@ -34,23 +49,21 @@ export const QueueDisplay: FC<QueueDisplayProps> = ({
 
   return (
     <div className={styles.grid}>
-      {players.map((p) => (
-        <div key={p.queueNumber} className={styles.tile}>
-          <span className={styles.tileNumber}>{p.queueNumber}</span>
+      {waitingQueue.map((slot) => (
+        <div key={slot.ticketNumber} className={styles.tile}>
+          <span className={styles.tileNumber}>{formatTicket(slot.ticketNumber)}</span>
         </div>
       ))}
-      {newSlotsAt && (
-        <div className={styles.infoTile}>
-          <span className={styles.infoTileLabel}>New slots open at:</span>
-          <span className={styles.infoTileValue}>{newSlotsAt}</span>
-        </div>
-      )}
-      {freeSlots !== undefined && (
-        <div className={styles.infoTile}>
-          <span className={styles.infoTileLabel}>Free slots available:</span>
-          <span className={styles.infoTileValue}>{freeSlots}</span>
-        </div>
-      )}
+
+      <div className={styles.infoTileFree}>
+        <span className={styles.infoTileLabel}>Free slots available:</span>
+        <span className={styles.infoTileValue}>{freeSlots}</span>
+      </div>
+
+      <div className={styles.infoTileNew}>
+        <span className={styles.infoTileLabel}>New slots open at:</span>
+        <span className={styles.infoTileValue}>{newSlotsAt ?? '—'}</span>
+      </div>
     </div>
   )
 }

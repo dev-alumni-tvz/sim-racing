@@ -1,4 +1,4 @@
-/* ---- List mode (admin panel queue rows) ---- */
+/* ---- List mode (admin-panel queue rows) ---- */
 .list {
   display: flex;
   flex-direction: column;
@@ -33,19 +33,18 @@
   white-space: nowrap;
 }
 
-/* ---- Grid mode (user-monitor queue tiles) ---- */
+/* ---- Grid mode (user-monitor — fixed 12-box layout) ---- */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(184px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
   gap: 12px;
   width: 100%;
 }
 
 .tile {
-  width: 184px;
-  height: 184px;
-  background: var(--color-card);
+  aspect-ratio: 1;
   border-radius: 8px;
+  background: rgba(15, 19, 29, 1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,11 +57,10 @@
   color: var(--color-text-dim);
 }
 
-/* Info tiles (New Slots / Free Slots) */
-.infoTile {
-  width: 184px;
-  height: 184px;
-  background: var(--gradient-tile);
+/* Info tiles */
+.infoTileFree,
+.infoTileNew {
+  aspect-ratio: 1;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -73,10 +71,18 @@
   gap: 8px;
 }
 
+.infoTileFree {
+  background: var(--gradient-free-slots);
+}
+
+.infoTileNew {
+  background: var(--gradient-new-slots);
+}
+
 .infoTileLabel {
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 20px;
   color: var(--color-text-soft);
   text-transform: uppercase;
   letter-spacing: 0.06em;
