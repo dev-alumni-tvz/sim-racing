@@ -9,7 +9,18 @@ export interface LeaderboardTableProps {
   size?: 'sm' | 'lg'
   useDmSans?: boolean
   maxHeight?: number
+  showHeaders?: boolean
 }
+
+const HEADERS = ['Pos', 'Name', 'Gap', 'Lap Time']
+
+const HeaderRow: FC = () => (
+  <div className={styles.headerRow}>
+    {HEADERS.map((h) => (
+      <span key={h} className={styles.headerCell}>{h}</span>
+    ))}
+  </div>
+)
 
 export const LeaderboardTable: FC<LeaderboardTableProps> = ({
   rows,
@@ -17,6 +28,7 @@ export const LeaderboardTable: FC<LeaderboardTableProps> = ({
   size = 'sm',
   useDmSans = false,
   maxHeight,
+  showHeaders = false,
 }) => {
   const renderRows = (items: typeof rows) =>
     items.map((row) => (
@@ -25,17 +37,23 @@ export const LeaderboardTable: FC<LeaderboardTableProps> = ({
 
   return (
     <div className={styles.wrapper}>
-
       {columns === 2 ? (
         <div className={styles.twoCol}>
-          <div className={styles.column}>{renderRows(rows.slice(0, Math.ceil(rows.length / 2)))}</div>
-          <div className={styles.column}>{renderRows(rows.slice(Math.ceil(rows.length / 2)))}</div>
+          <div className={styles.column}>
+            {showHeaders && <HeaderRow />}
+            {renderRows(rows.slice(0, Math.ceil(rows.length / 2)))}
+          </div>
+          <div className={styles.column}>
+            {showHeaders && <HeaderRow />}
+            {renderRows(rows.slice(Math.ceil(rows.length / 2)))}
+          </div>
         </div>
       ) : (
         <div
           className={`${styles.oneCol} ${maxHeight ? styles.scrollable : ''}`}
           style={maxHeight ? { maxHeight } : undefined}
         >
+          {showHeaders && <HeaderRow />}
           {renderRows(rows)}
         </div>
       )}
