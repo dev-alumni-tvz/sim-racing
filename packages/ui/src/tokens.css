@@ -6,8 +6,9 @@
 
   /* Accents */
   --color-glow-blue: #6ac8ff;
+  --color-glow-mid:  #68bdff;
   --color-deep-blue: #004288;
-  --color-mid-blue: #0074f1;
+  --color-mid-blue:  #0074f1;
 
   /* Interactive */
   --color-btn-primary: #0084ff;
@@ -39,6 +40,15 @@
   --gradient-top3: linear-gradient(90deg, #b07813 0%, #d4973a 100%);
   --gradient-card-blue: linear-gradient(135deg, #0074f1 0%, #004288 100%);
   --gradient-tile: linear-gradient(135deg, #0074f1 0%, #004288 100%);
+
+  /* Player card gradients (user-monitor) */
+  --gradient-driving:   linear-gradient(218.57deg, #0471FF 0%, #062A60 93.91%);
+  --gradient-next-up:   linear-gradient(208.27deg, #EFA767 0%, #934705 95.3%);
+  --gradient-previous:  linear-gradient(221.71deg, #172437 4.13%, #0F131D 93.39%);
+
+  /* Queue info tile gradients (user-monitor) */
+  --gradient-free-slots: linear-gradient(208.27deg, #3FC79F 0%, #009269 95.3%);
+  --gradient-new-slots:  linear-gradient(208.27deg, #B93A3A 0%, #730F0B 95.3%);
 
   /* Font stacks */
   --font-ui: 'Titillium Web', sans-serif;
