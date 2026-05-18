@@ -3,13 +3,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import type { LeaderboardUpdatedPayload, QueueUpdatedPayload } from '@sim-racing/api-types'
 import { buildLeaderboardConnection, buildQueueConnection } from '../services/signalr'
 
-export function useSignalR() {
+export function useSignalR(enabled = true) {
   const queryClient = useQueryClient()
   const [connected, setConnected] = useState(false)
   const lbRef = useRef<ReturnType<typeof buildLeaderboardConnection> | null>(null)
   const queueRef = useRef<ReturnType<typeof buildQueueConnection> | null>(null)
 
   useEffect(() => {
+    if (!enabled) return
     const lb = buildLeaderboardConnection()
     const queue = buildQueueConnection()
     lbRef.current = lb
@@ -51,7 +52,7 @@ export function useSignalR() {
       lb.stop()
       queue.stop()
     }
-  }, [queryClient])
+  }, [queryClient, enabled])
 
-  return { connected }
+  return { connected: enabled && connected }
 }

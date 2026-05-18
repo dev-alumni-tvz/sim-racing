@@ -1,257 +1,329 @@
+/* ============================================
+   DEMO / SIMULATION BANNER
+   ============================================ */
+.demoBanner {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #f5a623;
+    color: #000;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 20px;
+    border-radius: 0 0 6px 6px;
+    z-index: 100;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.demoBannerSim {
+    background: #7b61ff;
+    color: #fff;
+}
+
 .layout {
-  display: grid;
-  grid-template-columns: 367px 464px 464px 1fr;
-  height: 100vh;
-  overflow: hidden;
-  border-top: 1px solid var(--color-border-dark);
+    display: grid;
+    grid-template-columns: 433px 814px 607px;
+    height: 100vh;
+    overflow: hidden;
+    border-top: 1px solid var(--color-border-dark);
 }
 
 /* ---- Column borders ---- */
-.layout > * + * {
-  border-left: 1px solid var(--color-border-dark);
+.layout>*+* {
+    border-left: 1px solid var(--color-border-dark);
 }
 
 /* ============================================
    LEFT PANEL — All-time leaderboard
    ============================================ */
 .allTimePanel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 16px 12px;
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px 12px;
+    overflow: hidden;
 }
 
 .panelTitle {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--color-text-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 12px;
-  padding-left: 4px;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--color-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    padding-left: 4px;
 }
 
 /* ============================================
    CENTRE PANEL — Timer + controls + queue
    ============================================ */
 .centerPanel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 16px;
-  gap: 16px;
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px;
+    gap: 16px;
+    overflow: hidden;
+}
+
+/* Top row — timer + clock side by side */
+.topRow {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
 }
 
 /* Timer widget */
 .timerWidget {
-  background: var(--color-card);
-  border-radius: 8px;
-  padding: 20px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex-shrink: 0;
+    background: var(--color-card);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
 }
 
 .timerLabel {
-  font-family: var(--font-ui);
-  font-weight: 400;
-  font-size: 10px;
-  color: var(--color-text-label);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+    font-family: var(--font-ui);
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--color-text-label);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
 .timerDisplay {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 64px;
-  color: var(--color-text-primary);
-  line-height: 1;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 52px;
+    color: var(--color-text-primary);
+    line-height: 1;
 }
 
 .timerControls {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  margin-top: 4px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
 }
 
 .btnOffset {
-  width: 56px;
-  height: 44px;
-  background: var(--color-btn-dark);
-  border: none;
-  border-radius: 4px;
-  color: var(--color-text-soft);
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
-  transition: opacity 0.15s;
+    flex: 1;
+    height: 36px;
+    background: var(--color-btn-dark);
+    border: none;
+    border-radius: 4px;
+    color: var(--color-text-soft);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: opacity 0.15s;
 }
 
-.btnOffset:hover { opacity: 0.85; }
+.btnOffset:hover {
+    opacity: 0.85;
+}
 
 .btnPlayPause {
-  width: 96px;
-  height: 44px;
-  background: var(--color-btn-primary);
-  border: none;
-  border-radius: 4px;
-  color: #ffffff;
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  transition: opacity 0.15s;
+    flex: 1.4;
+    height: 36px;
+    background: var(--color-btn-primary);
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.15s;
 }
 
-.btnPlayPause:hover { opacity: 0.85; }
+.btnPlayPause:hover {
+    opacity: 0.85;
+}
 
 /* Current time widget */
 .currentTimeWidget {
-  background: var(--color-card);
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex-shrink: 0;
+    background: var(--color-card);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+    justify-content: center;
+    min-width: 220px;
 }
 
 .currentTimeLabel {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--color-text-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--color-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
 .currentTimeClock {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 52px;
-  color: var(--color-text-primary);
-  line-height: 1;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 44px;
+    color: var(--color-text-primary);
+    line-height: 1;
 }
 
 .nextQueueLabel {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 13px;
-  color: #314468;
-  margin-top: 4px;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--color-text-soft);
+    margin-top: 4px;
+}
+
+.drivingLabel {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--color-btn-green);
+    margin-top: 2px;
 }
 
 /* Action buttons */
 .actionRow {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .btnNextPlayer {
-  flex: 1;
-  height: 70px;
-  background: var(--color-btn-green);
-  border: none;
-  border-radius: 6px;
-  color: #ffffff;
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 20px;
-  cursor: pointer;
-  transition: opacity 0.15s;
+    flex: 1;
+    height: 56px;
+    background: var(--color-btn-green);
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 20px;
+    cursor: pointer;
+    transition: opacity 0.15s;
 }
 
-.btnNextPlayer:hover { opacity: 0.85; }
+.btnNextPlayer:hover {
+    opacity: 0.85;
+}
 
 .btnPause {
-  width: 86px;
-  height: 70px;
-  background: var(--color-btn-red);
-  border: none;
-  border-radius: 6px;
-  color: #ffffff;
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 20px;
-  cursor: pointer;
-  transition: opacity 0.15s;
+    width: 86px;
+    height: 56px;
+    background: var(--color-btn-red);
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 20px;
+    cursor: pointer;
+    transition: opacity 0.15s;
 }
 
-.btnPause:hover { opacity: 0.85; }
+.btnPause:hover {
+    opacity: 0.85;
+}
+
+.btnCancel {
+    width: 86px;
+    height: 56px;
+    background: var(--color-btn-dark);
+    border: 1px solid var(--color-border-dark);
+    border-radius: 6px;
+    color: var(--color-text-soft);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.btnCancel:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.btnCancel:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
 
 /* Queue panel */
 .queuePanel {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
 }
 
 .queueHeader {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
 }
 
 .queueTitle {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 20px;
-  color: var(--color-text-soft);
-  text-transform: uppercase;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--color-text-soft);
+    text-transform: uppercase;
 }
 
 .activeDot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--color-btn-danger);
-  flex-shrink: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--color-btn-danger);
+    flex-shrink: 0;
 }
 
 .queueScroll {
-  overflow-y: auto;
-  flex: 1;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-scrollbar) var(--color-divider);
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-scrollbar) var(--color-divider);
 }
 
-.queueScroll::-webkit-scrollbar { width: 6px; }
-.queueScroll::-webkit-scrollbar-track { background: var(--color-divider); }
-.queueScroll::-webkit-scrollbar-thumb { background: var(--color-scrollbar); border-radius: 3px; }
+.queueScroll::-webkit-scrollbar {
+    width: 6px;
+}
 
-/* ============================================
-   THIRD PANEL — second set of controls / guests
-   ============================================ */
-.guestPanel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 16px;
-  overflow: hidden;
+.queueScroll::-webkit-scrollbar-track {
+    background: var(--color-divider);
+}
+
+.queueScroll::-webkit-scrollbar-thumb {
+    background: var(--color-scrollbar);
+    border-radius: 3px;
 }
 
 /* ============================================
    RIGHT PANEL — Embedded user-monitor
    ============================================ */
 .monitorPanel {
-  overflow: hidden;
-  height: 100%;
+    overflow: hidden;
+    height: 100%;
 }
 
 .monitorFrame {
-  width: 100%;
-  height: 100%;
-  border: none;
-  transform-origin: top left;
+    width: 100%;
+    height: 100%;
+    border: none;
+    transform-origin: top left;
 }

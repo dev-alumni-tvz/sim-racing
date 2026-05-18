@@ -5,6 +5,9 @@ import type {
   StopSessionResponse,
   SkipAttendeeResponse,
   CancelSessionResponse,
+  EditAttendeeRequest,
+  EditLeaderboardRequest,
+  SwapQueueRequest,
 } from '@sim-racing/api-types'
 import { apiFetch } from './api'
 
@@ -24,13 +27,42 @@ export function stopSession(): Promise<StopSessionResponse> {
 }
 
 export function skipAttendee(attendeeId: string): Promise<SkipAttendeeResponse> {
-  return apiFetch<SkipAttendeeResponse>(`/api/admin/attendee/${attendeeId}/skip`, {
-    method: 'PATCH',
+  return apiFetch<SkipAttendeeResponse>(`/api/admin/queue/${attendeeId}/skip`, {
+    method: 'POST',
   })
 }
 
 export function cancelSession(sessionId: string): Promise<CancelSessionResponse> {
-  return apiFetch<CancelSessionResponse>(`/api/admin/session/${sessionId}/cancel`, {
-    method: 'PATCH',
+  return apiFetch<CancelSessionResponse>(`/api/admin/session/${sessionId}`, {
+    method: 'DELETE',
+  })
+}
+
+export function editAttendee(attendeeId: string, body: EditAttendeeRequest): Promise<void> {
+  return apiFetch<void>(`/api/admin/attendee/${attendeeId}`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  })
+}
+
+export function deleteAttendee(attendeeId: string): Promise<void> {
+  return apiFetch<void>(`/api/admin/attendee/${attendeeId}`, { method: 'DELETE' })
+}
+
+export function editLeaderboardEntry(attendeeId: string, body: EditLeaderboardRequest): Promise<void> {
+  return apiFetch<void>(`/api/admin/leaderboard/${attendeeId}`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  })
+}
+
+export function deleteLeaderboardEntry(attendeeId: string): Promise<void> {
+  return apiFetch<void>(`/api/admin/leaderboard/${attendeeId}`, { method: 'DELETE' })
+}
+
+export function swapQueuePositions(body: SwapQueueRequest): Promise<void> {
+  return apiFetch<void>('/api/admin/queue/swap', {
+    method: 'POST',
+    body: JSON.stringify(body),
   })
 }

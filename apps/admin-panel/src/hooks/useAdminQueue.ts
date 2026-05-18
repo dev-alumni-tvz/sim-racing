@@ -1,34 +1,36 @@
 import { useQuery } from '@tanstack/react-query'
-import type { AdminQueueResponse } from '@sim-racing/api-types'
-import { fullName, ticketToPosition } from '@sim-racing/api-types'
+import { useRef } from 'react'
+import type { AdminQueueEntry } from '@sim-racing/api-types'
+import { fullName } from '@sim-racing/api-types'
 import { fetchAdminQueue } from '../services/adminQueue'
 
-const PLACEHOLDER: AdminQueueResponse = {
-  entries: [
-    { attendeeId: 'a1', ticketNumber: '007', firstName: 'Davor',    lastName: 'Martinović', email: 'd.m@example.com', queuePosition: 7, status: 'driving',  estimatedWaitMinutes: 0 },
-    { attendeeId: 'a2', ticketNumber: '008', firstName: 'Luka',     lastName: 'Babić',      email: 'l.b@example.com', queuePosition: 8, status: 'waiting',  estimatedWaitMinutes: 3 },
-    { attendeeId: 'a3', ticketNumber: '009', firstName: 'Filip',    lastName: 'Knežević',   email: 'f.k@example.com', queuePosition: 9, status: 'waiting',  estimatedWaitMinutes: 8 },
-    { attendeeId: 'a4', ticketNumber: '010', firstName: 'Ivana',    lastName: 'Vuković',    email: 'i.v@example.com', queuePosition: 10, status: 'waiting', estimatedWaitMinutes: 13 },
-    { attendeeId: 'a5', ticketNumber: '011', firstName: 'Nikola',   lastName: 'Rajković',   email: 'n.r@example.com', queuePosition: 11, status: 'waiting', estimatedWaitMinutes: 18 },
-    { attendeeId: 'a6', ticketNumber: '012', firstName: 'Tea',      lastName: 'Živković',   email: 't.z@example.com', queuePosition: 12, status: 'waiting', estimatedWaitMinutes: 23 },
-    { attendeeId: 'a7', ticketNumber: '013', firstName: 'Bruno',    lastName: 'Stanković',  email: 'b.s@example.com', queuePosition: 13, status: 'waiting', estimatedWaitMinutes: 28 },
-  ],
+function transform(data: AdminQueueEntry[]) {
+  return data.map((e) => ({
+    attendeeId: e.attendeeId,
+    ticketNumber: e.ticketNumber,
+    queuePosition: e.queuePosition,
+    name: fullName(e.firstName, e.lastName),
+    firstName: e.firstName,
+    lastName: e.lastName,
+    email: e.email,
+    status: e.status,
+  }))
 }
 
-export function useAdminQueue() {
-  return useQuery({
+export function useAdminQueue(enabled = true) {
+  const last = useRef<ReturnType<typeof transform>>([])
+
+  const query = useQuery({
     queryKey: ['adminQueue'],
     queryFn: fetchAdminQueue,
+    enabled,
     refetchInterval: 2500,
-    placeholderData: PLACEHOLDER,
-    select: (data) =>
-      data.entries.map((e) => ({
-        attendeeId: e.attendeeId,
-        queueNumber: ticketToPosition(e.ticketNumber),
-        ticketNumber: e.ticketNumber,
-        name: fullName(e.firstName, e.lastName),
-        status: e.status,
-        estimatedWaitMinutes: e.estimatedWaitMinutes,
-      })),
+    select: (data) => {
+      const rows = transform(data)
+      last.current = rows
+      return rows
+    },
   })
+
+  return { ...query, data: query.data ?? last.current }
 }

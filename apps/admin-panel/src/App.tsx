@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react'
 import styles from './App.module.css'
-import { LeaderboardTable, QueueDisplay } from '@sim-racing/ui'
+import { LeaderboardTable } from '@sim-racing/ui'
 import { useTimerStore, formatTime } from './timerStore'
 import { useLeaderboard } from './hooks/useLeaderboard'
 import { useAdminQueue } from './hooks/useAdminQueue'
 import { useActiveSession } from './hooks/useActiveSession'
-import { useStartSession, useStopSession } from './hooks/useSessionMutations'
+import { useStartSession, useStopSession, useCancelSession } from './hooks/useSessionMutations'
 import { useSignalR } from './hooks/useSignalR'
+import { useAdminSimulation } from './hooks/useAdminSimulation'
+import { QueuePanel } from './components/QueuePanel'
+
+const SIM_MODE = new URLSearchParams(window.location.search).get('sim') === '1'
+const VISUAL_MODE = new URLSearchParams(window.location.search).get('visual') === '1'
+const DEMO_MODE = SIM_MODE || VISUAL_MODE
 
 function useClock() {
   const [time, setTime] = useState(() => new Date())
@@ -21,39 +27,66 @@ function clockStr(d: Date) {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
 }
 
+function nextFullHourCountdown(now: Date): string {
+  const next = new Date(now)
+  next.setHours(next.getHours() + 1, 0, 0, 0)
+  const diffMs = next.getTime() - now.getTime()
+  const totalSec = Math.floor(diffMs / 1000)
+  const m = Math.floor(totalSec / 60)
+  const s = totalSec % 60
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
+
 export default function App() {
   const { seconds, isRunning, start, pause, reset, addTime } = useTimerStore()
   const now = useClock()
 
-  const { connected } = useSignalR()
-  const { data: leaderboardRows = [] } = useLeaderboard(connected)
-  const { data: queueEntries = [] } = useAdminQueue()
-  const { data: activeSession } = useActiveSession()
+  const simMode = SIM_MODE ? 'sim' : VISUAL_MODE ? 'visual' : 'off'
+  const simData = useAdminSimulation(simMode)
+
+  const { connected } = useSignalR(!DEMO_MODE)
+  const { data: liveLeaderboard = [] } = useLeaderboard(connected, !DEMO_MODE)
+  const { data: liveQueue = [] } = useAdminQueue(!DEMO_MODE)
+  const { data: liveSession } = useActiveSession(!DEMO_MODE)
+
+  const leaderboardRows = simData?.leaderboardRows ?? liveLeaderboard
+  const queueEntries = simData?.queueEntries ?? liveQueue
+  const activeSession = simData?.activeSession ?? liveSession ?? null
+  const displaySeconds = simData?.timerSeconds ?? seconds
+  const displayRunning = simData?.isTimerRunning ?? isRunning
 
   const startSessionMutation = useStartSession()
   const stopSessionMutation = useStopSession()
-
-  const queuePlayers = queueEntries
-    .filter((e) => e.status === 'waiting' || e.status === 'driving')
-    .map((e) => ({ queueNumber: e.queueNumber, name: e.name }))
+  const cancelSessionMutation = useCancelSession()
 
   function handleNextPlayer() {
-    const nextWaiting = queueEntries.find((e) => e.status === 'waiting')
-    if (nextWaiting) {
-      startSessionMutation.mutate({ attendeeId: nextWaiting.attendeeId })
+    if (DEMO_MODE) return
+    const next = queueEntries.find((e) => e.status === 'waiting')
+    if (next) {
+      startSessionMutation.mutate({ attendeeId: next.attendeeId })
       reset()
       start()
     }
   }
 
   function handleStop() {
+    if (DEMO_MODE) return
     stopSessionMutation.mutate()
     pause()
     reset()
   }
 
+  const monitorBase = import.meta.env.VITE_MONITOR_URL ?? 'http://localhost:5175'
+  const monitorSrc = DEMO_MODE ? `${monitorBase}?visual=1` : monitorBase
+
   return (
     <div className={styles.layout}>
+      {DEMO_MODE && (
+        <div className={`${styles.demoBanner} ${SIM_MODE ? styles.demoBannerSim : ''}`}>
+          {SIM_MODE ? 'Simulation Mode' : 'Visual Preview'}
+        </div>
+      )}
+
       {/* ---- Left: All-time leaderboard ---- */}
       <aside className={styles.allTimePanel}>
         <p className={styles.panelTitle}>All Time Leaderboard</p>
@@ -62,74 +95,74 @@ export default function App() {
 
       {/* ---- Centre: Timer + controls + queue ---- */}
       <main className={styles.centerPanel}>
-        <div className={styles.timerWidget}>
-          <span className={styles.timerLabel}>Time Left:</span>
-          <span className={styles.timerDisplay}>{formatTime(seconds)}</span>
-          <div className={styles.timerControls}>
-            <button className={styles.btnOffset} onClick={() => addTime(-60)}>-1m</button>
-            <button className={styles.btnOffset} onClick={() => addTime(-10)}>-10s</button>
-            <button className={styles.btnOffset} onClick={() => addTime(-1)}>-1s</button>
-            <button className={styles.btnPlayPause} onClick={isRunning ? pause : start}>
-              {isRunning ? 'PAUSE' : 'PLAY'}
-            </button>
-            <button className={styles.btnOffset} onClick={() => addTime(1)}>+1s</button>
-            <button className={styles.btnOffset} onClick={() => addTime(10)}>+10s</button>
-            <button className={styles.btnOffset} onClick={() => addTime(60)}>+1m</button>
+        <div className={styles.topRow}>
+          <div className={styles.timerWidget}>
+            <span className={styles.timerLabel}>Time Left</span>
+            <span className={styles.timerDisplay}>{formatTime(displaySeconds)}</span>
+            <div className={styles.timerControls}>
+              <button className={styles.btnOffset} onClick={() => addTime(-60)} disabled={DEMO_MODE}>-1m</button>
+              <button className={styles.btnOffset} onClick={() => addTime(-10)} disabled={DEMO_MODE}>-10s</button>
+              <button className={styles.btnOffset} onClick={() => addTime(-1)} disabled={DEMO_MODE}>-1s</button>
+              <button className={styles.btnPlayPause} onClick={DEMO_MODE ? undefined : (displayRunning ? pause : start)} disabled={DEMO_MODE}>
+                {displayRunning ? '⏸' : '▶'}
+              </button>
+              <button className={styles.btnOffset} onClick={() => addTime(1)} disabled={DEMO_MODE}>+1s</button>
+              <button className={styles.btnOffset} onClick={() => addTime(10)} disabled={DEMO_MODE}>+10s</button>
+              <button className={styles.btnOffset} onClick={() => addTime(60)} disabled={DEMO_MODE}>+1m</button>
+            </div>
           </div>
-          <button className={styles.btnOffset} style={{ marginTop: 4 }} onClick={reset}>
-            Reset
-          </button>
-        </div>
 
-        <div className={styles.currentTimeWidget}>
-          <span className={styles.currentTimeLabel}>Current Time</span>
-          <span className={styles.currentTimeClock}>{clockStr(now)}</span>
-          {activeSession && (
+          <div className={styles.currentTimeWidget}>
+            <span className={styles.currentTimeLabel}>Current Time</span>
+            <span className={styles.currentTimeClock}>{clockStr(now)}</span>
             <span className={styles.nextQueueLabel}>
-              DRIVING: {activeSession.name} ({activeSession.ticketNumber})
+              Next queue in: {nextFullHourCountdown(now)}
             </span>
-          )}
+            {activeSession && (
+              <span className={styles.drivingLabel}>
+                {activeSession.name} ({activeSession.ticketNumber})
+              </span>
+            )}
+          </div>
         </div>
 
         <div className={styles.actionRow}>
           <button
             className={styles.btnNextPlayer}
             onClick={handleNextPlayer}
-            disabled={startSessionMutation.isPending}
+            disabled={DEMO_MODE || startSessionMutation.isPending}
           >
             NEXT PLAYER
           </button>
           <button
             className={styles.btnPause}
             onClick={handleStop}
-            disabled={!activeSession || stopSessionMutation.isPending}
+            disabled={DEMO_MODE || !activeSession || stopSessionMutation.isPending}
           >
             STOP
           </button>
+          <button
+            className={styles.btnCancel}
+            onClick={() => !DEMO_MODE && activeSession && cancelSessionMutation.mutate(activeSession.sessionId)}
+            disabled={DEMO_MODE || !activeSession || cancelSessionMutation.isPending}
+            title="Cancel session — removes player, no time recorded"
+          >
+            CANCEL
+          </button>
         </div>
 
-        <div className={styles.queuePanel}>
-          <div className={styles.queueHeader}>
-            <span className={styles.queueTitle}>Current Queue</span>
-            {activeSession && <span className={styles.activeDot} />}
-          </div>
-          <div className={styles.queueScroll}>
-            <QueueDisplay players={queuePlayers} />
-          </div>
-        </div>
+        <QueuePanel
+          queueEntries={queueEntries}
+          activeSession={activeSession}
+          playedEntries={simData?.playedEntries}
+        />
       </main>
-
-      {/* ---- Third panel: Guest leaderboard view ---- */}
-      <section className={styles.guestPanel}>
-        <p className={styles.panelTitle}>Guests</p>
-        <LeaderboardTable rows={leaderboardRows.slice(0, 5)} size="sm" />
-      </section>
 
       {/* ---- Right: Embedded user-monitor ---- */}
       <div className={styles.monitorPanel}>
         <iframe
           className={styles.monitorFrame}
-          src={`${import.meta.env.VITE_MONITOR_URL ?? 'http://localhost:5175'}`}
+          src={monitorSrc}
           title="User Monitor"
         />
       </div>
