@@ -1,27 +1,27 @@
 .page {
     width: 100%;
-    max-width: 1440px;
-    min-height: 2560px;
-    padding: 0 136px;
+    max-width: 2560px;
+    min-height: 100vh;
+    padding: 0 clamp(40px, 9.44vw, 200px);
+    padding-bottom: clamp(32px, 3.33vw, 64px);
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 230px;
-    padding-bottom: 48px;
-    background: url('/bg-heading.svg') top center / auto 1181px no-repeat, var(--color-bg);
+    gap: clamp(60px, 15.97vw, 380px);
+    background: url('/bg-heading.svg') top center / auto clamp(400px, 82vw, 1600px) no-repeat, var(--color-bg);
 }
 
 /* ---- Header ---- */
 .header {
     position: relative;
-    height: 280px;
+    height: clamp(120px, 19.44vw, 400px);
     background: transparent;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding-top: 40px;
+    padding-top: clamp(16px, 2.78vw, 60px);
 }
 
 .headerMeta {
@@ -30,49 +30,48 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 28px;
+    gap: clamp(12px, 1.94vw, 48px);
 }
 
 .poweredBy {
     font-family: var(--font-brand);
     font-weight: 400;
-    font-size: 24px;
+    font-size: clamp(14px, 1.67vw, 40px);
     color: #ffffff;
 }
 
 .headerLogo {
-    width: 450px;
+    width: clamp(160px, 31.25vw, 700px);
     height: auto;
 }
 
 .headerSub {
     font-family: var(--font-brand);
     font-weight: 400;
-    font-size: 15px;
+    font-size: clamp(11px, 1.04vw, 24px);
     color: rgba(255, 255, 255, 0.8);
 }
 
 .mainContent {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: clamp(20px, 2.78vw, 64px);
 }
 
 /* ---- Podium ---- */
 .podiumSection {
-    padding: 0 48px;
+    padding: 0 clamp(16px, 3.33vw, 80px);
 }
 
 .sectionTitle {
     font-family: var(--font-ui);
     font-weight: 700;
-    font-size: 20px;
+    font-size: clamp(13px, 1.39vw, 32px);
     color: var(--color-text-soft);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin-bottom: 20px;
+    margin-bottom: clamp(10px, 1.39vw, 32px);
 }
-
 
 .podiumDivider {
     width: 100%;
@@ -87,9 +86,9 @@
 .leaderboardLink {
     font-family: var(--font-ui);
     font-weight: 400;
-    font-size: 16px;
+    font-size: clamp(11px, 1.11vw, 24px);
     color: white;
-    margin-top: 16px;
+    margin-top: clamp(8px, 1.11vw, 24px);
     text-align: center;
 }
 
@@ -99,11 +98,11 @@
 }
 
 .leaderboardSection {
-    padding: 0 48px;
+    padding: 0 clamp(16px, 3.33vw, 80px);
     z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: clamp(16px, 2.78vw, 64px);
 }
 
 /* ---- Currently Driving ---- */
@@ -111,11 +110,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 24px;
-    padding: 0 48px;
+    gap: clamp(12px, 1.67vw, 40px);
+    padding: 0 clamp(16px, 3.33vw, 80px);
 }
 
 /* ---- Queue grid ---- */
 .queueSection {
-    padding: 0 48px;
+    padding: 0 clamp(16px, 3.33vw, 80px);
 }

@@ -17,3 +17,16 @@ html, body {
 #root {
   min-height: 100vh;
 }
+
+/* Leaderboard responsive overrides — only applied in user-monitor */
+:root {
+  --lb-row-height: clamp(20px, 2.57vw, 52px);
+  --lb-row-lg-height: clamp(35px, 4.86vw, 100px);
+  --lb-font-size: clamp(10px, 1.04vw, 22px);
+  --lb-font-size-lg: clamp(14px, 1.67vw, 40px);
+  --lb-font-size-gap: clamp(8px, 0.83vw, 18px);
+  --lb-font-size-gap-lg: clamp(10px, 1.11vw, 24px);
+  --lb-font-size-time: clamp(9px, 0.97vw, 20px);
+  --lb-font-size-time-lg: clamp(12px, 1.39vw, 28px);
+  --lb-header-font: clamp(9px, 0.9vw, 20px);
+}

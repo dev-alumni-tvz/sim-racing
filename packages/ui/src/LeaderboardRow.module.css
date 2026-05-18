@@ -5,7 +5,7 @@
     background: var(--color-card);
     border-bottom: 1px solid var(--color-divider);
     padding: 0 12px;
-    height: 37px;
+    height: var(--lb-row-height, 37px);
     box-sizing: border-box;
     border-radius: 12px;
     min-width: 0;
@@ -13,7 +13,7 @@
 }
 
 .rowLg {
-    height: 70px;
+    height: var(--lb-row-lg-height, 70px);
 }
 
 /* Per-rank gradients */
@@ -43,18 +43,18 @@
 .pos {
     font-family: var(--font-ui);
     font-weight: 600;
-    font-size: 15px;
+    font-size: var(--lb-font-size, 15px);
     color: var(--color-text-muted);
 }
 
 .rowLg .pos {
-    font-size: 24px;
+    font-size: var(--lb-font-size-lg, 24px);
 }
 
 .name {
     font-family: var(--font-ui);
     font-weight: 600;
-    font-size: 15px;
+    font-size: var(--lb-font-size, 15px);
     color: var(--color-text-soft);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -64,32 +64,32 @@
 }
 
 .rowLg .name {
-    font-size: 24px;
+    font-size: var(--lb-font-size-lg, 24px);
 }
 
 .gap {
     font-family: var(--font-ui);
     font-weight: 300;
-    font-size: 12px;
+    font-size: var(--lb-font-size-gap, 12px);
     color: var(--color-text-muted);
     text-align: right;
     opacity: 0.8;
 }
 
 .rowLg .gap {
-    font-size: 16px;
+    font-size: var(--lb-font-size-gap-lg, 16px);
 }
 
 .lapTime {
     font-family: var(--font-ui);
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--lb-font-size-time, 14px);
     color: var(--color-text-soft);
     text-align: right;
 }
 
 .rowLg .lapTime {
-    font-size: 20px;
+    font-size: var(--lb-font-size-time-lg, 20px);
 }
 
 /* Mobile: DM Sans only for pos + name; gap + lapTime stay Titillium Web */
