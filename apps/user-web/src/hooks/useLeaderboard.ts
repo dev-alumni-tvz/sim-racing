@@ -33,13 +33,14 @@ function transform(data: LeaderboardResponse) {
 
 const INITIAL_ROWS = transform(PLACEHOLDER)
 
-export function useLeaderboard() {
-  const lastRows = useRef(INITIAL_ROWS)
+export function useLeaderboard(enabled = true, visualMode = false) {
+  const lastRows = useRef<ReturnType<typeof transform>>([])
 
   const query = useQuery({
     queryKey: ['leaderboard'],
     queryFn: fetchLeaderboard,
     refetchInterval: 2500,
+    enabled,
     select: (data) => {
       const rows = transform(data)
       lastRows.current = rows
@@ -47,5 +48,6 @@ export function useLeaderboard() {
     },
   })
 
+  if (visualMode) return { ...query, data: INITIAL_ROWS }
   return { ...query, data: query.data ?? lastRows.current }
 }

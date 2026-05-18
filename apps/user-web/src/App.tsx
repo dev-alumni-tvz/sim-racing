@@ -2,24 +2,33 @@ import { useState } from 'react';
 import styles from './App.module.css';
 import { LeaderboardTable, TicketCard } from '@sim-racing/ui';
 import { useLeaderboard } from './hooks/useLeaderboard';
+import { useSimulation } from './hooks/useSimulation';
 import type { RegistrationResponse } from '@sim-racing/api-types';
 import { JoinQueueModal } from './components/JoinQueueModal';
+
+const SIM_MODE = new URLSearchParams(window.location.search).get('sim') === '1';
+const VISUAL_MODE = new URLSearchParams(window.location.search).get('visual') === '1';
+
+const VISUAL_TICKET: RegistrationResponse = { attendeeId: 'visual', ticketNumber: '004', queuePosition: 4, estimatedWaitMinutes: 10 };
 
 export default function App() {
 	const [search, setSearch] = useState('');
 	const [modalOpen, setModalOpen] = useState(false);
-	const [ticket, setTicket] = useState<RegistrationResponse | null>(null);
-	const [ticketName, setTicketName] = useState('');
+	const [liveTicket, setLiveTicket] = useState<RegistrationResponse | null>(null);
+	const [liveTicketName, setLiveTicketName] = useState('');
 
-	const { data: rows = [] } = useLeaderboard();
+	const { data: liveRows } = useLeaderboard(!SIM_MODE, VISUAL_MODE);
+	const { rows: simRows, ticket: simTicket, ticketName: simTicketName, join: simJoin } = useSimulation(SIM_MODE);
 
-	const filtered = search
-		? rows.filter((r) => r.name.toLowerCase().includes(search.toLowerCase()))
-		: rows;
+	const rows = SIM_MODE ? simRows : (liveRows ?? []);
+	const ticket = SIM_MODE ? simTicket : VISUAL_MODE ? VISUAL_TICKET : liveTicket;
+	const ticketName = SIM_MODE ? simTicketName : VISUAL_MODE ? 'Demo Korisnik' : liveTicketName;
+
+	const filtered = search ? rows.filter((r) => r.name.toLowerCase().includes(search.toLowerCase())) : rows;
 
 	function handleSuccess(data: RegistrationResponse, firstName: string, lastName: string) {
-		setTicket(data);
-		setTicketName(`${firstName} ${lastName}`);
+		setLiveTicket(data);
+		setLiveTicketName(`${firstName} ${lastName}`);
 		setModalOpen(false);
 	}
 
@@ -49,17 +58,15 @@ export default function App() {
 					Prijavi se, odvezi svoj najbolji krug i<br />
 					popni se na leaderboard.
 				</p>
-				{!ticket && (
+				{!ticket && !VISUAL_MODE && (
 					<button
 						className={styles.joinBtn}
-						onClick={() => setModalOpen(true)}
+						onClick={() => (SIM_MODE ? simJoin() : setModalOpen(true))}
 					>
 						Join the Queue
 					</button>
 				)}
 			</section>
-
-			<div className={styles.heroSeparator} />
 
 			{ticket && (
 				<div className={styles.ticketWrapper}>
@@ -70,6 +77,8 @@ export default function App() {
 					/>
 				</div>
 			)}
+
+			<div className={styles.heroSeparator} />
 
 			<section className={styles.leaderboardSection}>
 				<h2 className={styles.lbTitle}>Leaderboard</h2>
