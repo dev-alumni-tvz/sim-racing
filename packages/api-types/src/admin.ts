@@ -1,21 +1,17 @@
-// GET /api/admin/queue
+// GET /api/admin/queue — returns flat array
 export type AttendeeStatus = 'waiting' | 'driving' | 'done' | 'skipped'
 
 export interface AdminQueueEntry {
   attendeeId: string
-  /** Format: "SIM-XXXX" */
   ticketNumber: string
   firstName: string
   lastName: string
   email: string
   queuePosition: number
   status: AttendeeStatus
-  estimatedWaitMinutes: number
 }
 
-export interface AdminQueueResponse {
-  entries: AdminQueueEntry[]
-}
+export type AdminQueueResponse = AdminQueueEntry[]
 
 // GET /api/admin/session/active  (404 when no active session)
 export interface ActiveSessionResponse {
@@ -49,14 +45,32 @@ export interface StopSessionResponse {
   bridgeDataReceived: boolean
 }
 
-// PATCH /api/admin/attendee/{attendeeId}/skip
+// POST /api/admin/queue/{attendeeId}/skip
 export interface SkipAttendeeResponse {
   attendeeId: string
   status: 'skipped'
 }
 
-// PATCH /api/admin/session/{sessionId}/cancel
+// DELETE /api/admin/session/{sessionId}
 export interface CancelSessionResponse {
   sessionId: string
   status: 'cancelled'
+}
+
+// PUT /api/admin/attendee/{attendeeId}
+export interface EditAttendeeRequest {
+  firstName?: string
+  lastName?: string
+  email?: string
+}
+
+// PUT /api/admin/leaderboard/{sessionId}  (sessionId === attendeeId)
+export interface EditLeaderboardRequest {
+  bestLapMs: number
+}
+
+// POST /api/admin/queue/swap
+export interface SwapQueueRequest {
+  attendeeIdA: string
+  attendeeIdB: string
 }

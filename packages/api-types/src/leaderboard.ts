@@ -1,6 +1,8 @@
 // GET /api/leaderboard
 export interface LeaderboardEntry {
   rank: number
+  attendeeId: string
+  ticketNumber: string
   firstName: string
   lastName: string
   /** Lap time in milliseconds */
