@@ -7,7 +7,7 @@ export interface RegistrationRequest {
 
 export interface RegistrationResponse {
   attendeeId: string
-  /** Format: "SIM-XXXX", e.g. "SIM-0047" */
+  /** 3-digit zero-padded number, e.g. "047" */
   ticketNumber: string
   queuePosition: number
   estimatedWaitMinutes: number

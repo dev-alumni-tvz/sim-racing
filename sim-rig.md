@@ -35,7 +35,7 @@ Admin endpoints require the header `X-Api-Key: {key}` — will be shared separat
 // 201 Created
 {
   "attendeeId": "3fa85f64-...",
-  "ticketNumber": "SIM-0047",
+  "ticketNumber": "047",
   "queuePosition": 47,
   "estimatedWaitMinutes": 12
 }
@@ -71,13 +71,13 @@ Poll this every 30 seconds on the ticket page to keep the estimate fresh. The es
 // 200 OK
 {
   "currentDriver": {
-    "ticketNumber": "SIM-0046",
+    "ticketNumber": "046",
     "firstName": "Marko",
     "sessionStartedAt": "2026-05-08T10:14:00Z",
     "elapsedSeconds": 142
   },
   "nextDriver": {
-    "ticketNumber": "SIM-0047",
+    "ticketNumber": "047",
     "firstName": "Ana",
     "estimatedWaitMinutes": 3
   },
@@ -126,7 +126,7 @@ All require `X-Api-Key` header.
   "entries": [
     {
       "attendeeId": "3fa85f64-...",
-      "ticketNumber": "SIM-0047",
+      "ticketNumber": "047",
       "firstName": "Ana",
       "lastName": "Kovač",
       "email": "ana@example.com",
@@ -149,7 +149,7 @@ Statuses: `waiting`, `driving`, `done`, `skipped`.
 {
   "sessionId": "9b1deb4d-...",
   "attendeeId": "3fa85f64-...",
-  "ticketNumber": "SIM-0047",
+  "ticketNumber": "047",
   "firstName": "Ana",
   "lastName": "Kovač",
   "startedAt": "2026-05-08T10:20:00Z"
@@ -174,7 +174,7 @@ Statuses: `waiting`, `driving`, `done`, `skipped`.
 {
   "sessionId": "9b1deb4d-...",
   "attendeeId": "3fa85f64-...",
-  "ticketNumber": "SIM-0047",
+  "ticketNumber": "047",
   "startedAt": "2026-05-08T10:20:00Z"
 }
 ```

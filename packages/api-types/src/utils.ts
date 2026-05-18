@@ -21,11 +21,8 @@ export function fullName(firstName: string, lastName: string): string {
   return `${firstName} ${lastName}`
 }
 
-/**
- * Extracts the numeric position from a ticket number like "SIM-0047" → 47.
- * Falls back to 0 if the format is unexpected.
- */
+/** Parses a 3-digit ticket number string to an integer, e.g. "047" → 47. */
 export function ticketToPosition(ticketNumber: string): number {
-  const n = parseInt(ticketNumber.replace(/^[A-Z]+-/, ''), 10)
+  const n = parseInt(ticketNumber, 10)
   return isNaN(n) ? 0 : n
 }

@@ -23,7 +23,7 @@ export interface QueueDisplayProps {
 }
 
 function formatTicket(ticketNumber: string): string {
-  const n = parseInt(ticketNumber.replace(/^[A-Z]+-/, ''), 10)
+  const n = parseInt(ticketNumber, 10)
   return isNaN(n) ? ticketNumber : String(n).padStart(3, '0')
 }
 
