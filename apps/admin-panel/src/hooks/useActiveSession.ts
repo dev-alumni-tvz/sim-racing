@@ -28,14 +28,7 @@ export function useActiveSession(enabled = true) {
 
   const query = useQuery({
     queryKey: ['activeSession'],
-    queryFn: async () => {
-      try {
-        return await fetchActiveSession()
-      } catch (e) {
-        if (e instanceof Error && e.message.startsWith('404')) return null
-        throw e
-      }
-    },
+    queryFn: () => fetchActiveSession(),
     enabled,
     refetchInterval: 2500,
     select: (data: ActiveSessionResponse | null) => {

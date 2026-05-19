@@ -11,8 +11,8 @@ import type {
 } from '@sim-racing/api-types'
 import { apiFetch } from './api'
 
-export function fetchActiveSession(): Promise<ActiveSessionResponse> {
-  return apiFetch<ActiveSessionResponse>('/api/admin/session/active')
+export function fetchActiveSession(): Promise<ActiveSessionResponse | null> {
+  return apiFetch<ActiveSessionResponse | null>('/api/admin/session/active')
 }
 
 export function startSession(body: StartSessionRequest): Promise<StartSessionResponse> {
