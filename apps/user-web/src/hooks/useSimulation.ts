@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import type { RegistrationResponse } from '@sim-racing/api-types'
 
 const PHASE_MS = 1000
 
@@ -9,6 +8,12 @@ type LeaderboardRow = {
   lapTime: string
   gap: string | null
   isTop3: boolean
+}
+
+type SimTicket = {
+  name: string
+  queueNumber: number
+  estimatedWaitMinutes: number
 }
 
 const ALL_ROWS: LeaderboardRow[] = [
@@ -27,10 +32,9 @@ const DEMO_ROW: LeaderboardRow = {
   position: 10, name: 'Demo Korisnik', lapTime: '1:27.456', gap: '+4.000', isTop3: false,
 }
 
-const MOCK_TICKET: RegistrationResponse = {
-  attendeeId: 'sim-demo',
-  ticketNumber: '003',
-  queuePosition: 3,
+const MOCK_TICKET: SimTicket = {
+  name: 'Demo Korisnik',
+  queueNumber: 3,
   estimatedWaitMinutes: 8,
 }
 
@@ -53,7 +57,7 @@ export function useSimulation(enabled: boolean) {
     if (enabled && (phase === 0 || phase === FINAL_PHASE)) setPhase(1)
   }
 
-  if (!enabled) return { rows: [], ticket: null, ticketName: '', join: () => {} }
+  if (!enabled) return { rows: [], ticket: null, join: () => {} }
 
   const hasRaced = phase === FINAL_PHASE
   const showTicket = phase > 0 && !hasRaced
@@ -64,8 +68,7 @@ export function useSimulation(enabled: boolean) {
 
   return {
     rows,
-    ticket:     showTicket ? MOCK_TICKET : null,
-    ticketName: showTicket ? 'Demo Korisnik' : '',
+    ticket: showTicket ? MOCK_TICKET : null,
     join,
   }
 }

@@ -7,6 +7,6 @@ export function useWaitEstimate(position: number | null) {
     queryFn: () => fetchWaitEstimate(position!),
     enabled: position !== null,
     refetchInterval: 30_000,
-    select: (data) => data.estimatedWaitMinutes,
+    select: (seconds: number) => Math.ceil(seconds / 60),
   })
 }

@@ -9,26 +9,29 @@ import { JoinQueueModal } from './components/JoinQueueModal';
 const SIM_MODE = new URLSearchParams(window.location.search).get('sim') === '1';
 const VISUAL_MODE = new URLSearchParams(window.location.search).get('visual') === '1';
 
-const VISUAL_TICKET: RegistrationResponse = { attendeeId: 'visual', ticketNumber: '004', queuePosition: 4, estimatedWaitMinutes: 10 };
+interface TicketState {
+  name: string
+  queueNumber?: number
+  estimatedWaitMinutes?: number
+}
+
+const VISUAL_TICKET: TicketState = { name: 'Demo Korisnik', queueNumber: 4, estimatedWaitMinutes: 10 };
 
 export default function App() {
 	const [search, setSearch] = useState('');
 	const [modalOpen, setModalOpen] = useState(false);
-	const [liveTicket, setLiveTicket] = useState<RegistrationResponse | null>(null);
-	const [liveTicketName, setLiveTicketName] = useState('');
+	const [liveTicket, setLiveTicket] = useState<TicketState | null>(null);
 
 	const { data: liveRows } = useLeaderboard(!SIM_MODE, VISUAL_MODE);
-	const { rows: simRows, ticket: simTicket, ticketName: simTicketName, join: simJoin } = useSimulation(SIM_MODE);
+	const { rows: simRows, ticket: simTicket, join: simJoin } = useSimulation(SIM_MODE);
 
 	const rows = SIM_MODE ? simRows : (liveRows ?? []);
 	const ticket = SIM_MODE ? simTicket : VISUAL_MODE ? VISUAL_TICKET : liveTicket;
-	const ticketName = SIM_MODE ? simTicketName : VISUAL_MODE ? 'Demo Korisnik' : liveTicketName;
 
 	const filtered = search ? rows.filter((r) => r.name.toLowerCase().includes(search.toLowerCase())) : rows;
 
-	function handleSuccess(data: RegistrationResponse, firstName: string, lastName: string) {
-		setLiveTicket(data);
-		setLiveTicketName(`${firstName} ${lastName}`);
+	function handleSuccess(_data: RegistrationResponse, firstName: string, lastName: string) {
+		setLiveTicket({ name: `${firstName} ${lastName}` });
 		setModalOpen(false);
 	}
 
@@ -71,8 +74,8 @@ export default function App() {
 			{ticket && (
 				<div className={styles.ticketWrapper}>
 					<TicketCard
-						queueNumber={ticket.queuePosition}
-						name={ticketName}
+						queueNumber={ticket.queueNumber}
+						name={ticket.name}
 						estimatedWaitMinutes={ticket.estimatedWaitMinutes}
 					/>
 				</div>

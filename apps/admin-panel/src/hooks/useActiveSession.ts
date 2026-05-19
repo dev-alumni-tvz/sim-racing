@@ -17,7 +17,7 @@ function transform(data: ActiveSessionResponse | null): Session {
   return {
     sessionId: data.sessionId,
     attendeeId: data.attendeeId,
-    name: fullName(data.firstName, data.lastName),
+    name: fullName(data.attendeeFirstName, data.attendeeLastName),
     ticketNumber: data.ticketNumber,
     startedAt: data.startedAt,
   }
