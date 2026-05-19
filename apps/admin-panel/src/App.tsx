@@ -9,6 +9,8 @@ import { useStartSession, useStopSession, useCancelSession } from './hooks/useSe
 import { useSignalR } from './hooks/useSignalR'
 import { useAdminSimulation } from './hooks/useAdminSimulation'
 import { QueuePanel } from './components/QueuePanel'
+import { LoginPage } from './components/LoginPage'
+import { isAuthenticated } from './services/auth'
 
 const SIM_MODE = new URLSearchParams(window.location.search).get('sim') === '1'
 const VISUAL_MODE = new URLSearchParams(window.location.search).get('visual') === '1'
@@ -38,6 +40,16 @@ function nextFullHourCountdown(now: Date): string {
 }
 
 export default function App() {
+  const [loggedIn, setLoggedIn] = useState(() => DEMO_MODE || isAuthenticated())
+
+  if (!loggedIn) {
+    return <LoginPage onLogin={() => setLoggedIn(true)} />
+  }
+
+  return <AdminApp />
+}
+
+function AdminApp() {
   const { seconds, isRunning, start, pause, reset, addTime } = useTimerStore()
   const now = useClock()
 

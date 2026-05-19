@@ -1,15 +1,22 @@
 const BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:5000'
-const API_KEY = (import.meta.env.VITE_ADMIN_API_KEY as string | undefined) ?? ''
+
+export const JWT_KEY = 'admin_jwt'
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = localStorage.getItem(JWT_KEY)
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: {
       'Content-Type': 'application/json',
-      'X-Api-Key': API_KEY,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init?.headers,
     },
     ...init,
   })
+  if (res.status === 401) {
+    localStorage.removeItem(JWT_KEY)
+    window.location.reload()
+    throw new Error('401 Unauthorized')
+  }
   if (!res.ok) throw new Error(`${res.status} ${path}`)
   const text = await res.text()
   return (text ? JSON.parse(text) : undefined) as T
