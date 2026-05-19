@@ -13,13 +13,13 @@ export interface AdminQueueEntry {
 
 export type AdminQueueResponse = AdminQueueEntry[]
 
-// GET /api/admin/session/active  (404 when no active session)
+// GET /api/admin/session/active  (204 when no active session)
 export interface ActiveSessionResponse {
   sessionId: string
   attendeeId: string
   ticketNumber: string
-  firstName: string
-  lastName: string
+  attendeeFirstName: string
+  attendeeLastName: string
   startedAt: string
 }
 

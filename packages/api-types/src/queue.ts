@@ -14,7 +14,5 @@ export interface QueueDisplayResponse {
   estimatedWaitSeconds: number
 }
 
-// GET /api/queue/wait-estimate
-export interface WaitEstimateResponse {
-  estimatedWaitMinutes: number
-}
+// GET /api/queue/wait-estimate — returns raw integer seconds
+export type WaitEstimateResponse = number
