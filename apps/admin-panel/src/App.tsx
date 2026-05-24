@@ -49,7 +49,7 @@ export default function App() {
 }
 
 function AdminApp() {
-  const { seconds, isRunning, start, pause, reset, expire, addTime } = useTimerStore()
+  const { seconds, isRunning, start, pause, reset, addTime } = useTimerStore()
   const now = useClock()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const autoStopFired = useRef(false)
@@ -87,7 +87,6 @@ function AdminApp() {
   function handleFinish() {
     if (DEMO_MODE) return
     stopSessionMutation.mutate()
-    expire()
   }
 
   function handlePauseResume() {

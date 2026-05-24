@@ -14,9 +14,6 @@ import {
 } from '../services/session'
 import type { EditAttendeeRequest, EditLeaderboardRequest, SwapQueueRequest } from '@sim-racing/api-types'
 
-// Hardcoded test lap time used for local testing (1:23.450)
-const TEST_LAP_MS = 83_450
-
 export function useStartSession() {
   const qc = useQueryClient()
   return useMutation({
@@ -32,21 +29,10 @@ export function useStopSession() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: stopSession,
-    onSuccess: (data) => {
-      console.log('[session/stop] response:', data)
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['activeSession'] })
       qc.invalidateQueries({ queryKey: ['adminQueue'] })
       qc.invalidateQueries({ queryKey: ['leaderboard'] })
-      // Wait for backend to create the leaderboard entry before patching the test time
-      setTimeout(() => {
-        console.log('[session/stop] patching test lap time for attendeeId:', data.attendeeId)
-        editLeaderboardEntry(data.attendeeId, { bestLapMs: TEST_LAP_MS })
-          .then(() => {
-            console.log('[session/stop] leaderboard patched — invalidating')
-            qc.invalidateQueries({ queryKey: ['leaderboard'] })
-          })
-          .catch((err) => console.error('[session/stop] leaderboard patch failed:', err))
-      }, 800)
     },
     onError: () => {
       // 400 means no active session — stale frontend state; sync all queries
