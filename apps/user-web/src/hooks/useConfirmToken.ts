@@ -11,6 +11,9 @@ export function useConfirmToken() {
     enabled: !!token,
     retry: false,
     staleTime: Infinity,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 
   useEffect(() => {
