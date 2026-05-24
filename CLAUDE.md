@@ -144,30 +144,46 @@ Use `src/assets/` when importing images directly in TypeScript components.
 
 Figma MCP is configured in `~/.claude/.mcp.json`. Claude Code can read Figma designs directly — paste a Figma file URL and Claude will extract colors, spacing, and component layouts.
 
-## Admin Panel API Contracts
+## API Reference
 
-Auth: `X-Api-Key` header on all admin routes.
+**Base URL:** configured via `VITE_API_URL` env var (e.g. `https://api.sim-cd.com`)
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `/api/admin/queue` | Returns flat array of all attendees with status |
-| POST | `/api/admin/session/start` | Body: `{ attendeeId }` — starts driving session |
-| POST | `/api/admin/session/stop` | Ends active session, time records |
-| DELETE | `/api/admin/session/{sessionId}` | Cancels session (driver left early), no time recorded |
-| GET | `/api/admin/session/active` | Returns active session or null |
-| POST | `/api/admin/queue/{attendeeId}/skip` | Moves attendee to back of queue |
-| POST | `/api/admin/queue/swap` | **Pending** — see Backend Requirements |
-| PUT | `/api/admin/attendee/{attendeeId}` | Edit attendee personal details |
-| DELETE | `/api/admin/attendee/{attendeeId}` | Remove attendee entirely |
-| PUT | `/api/admin/leaderboard/{sessionId}` | Override lap time (`sessionId === attendeeId`) |
-| DELETE | `/api/admin/leaderboard/{sessionId}` | Remove entry from leaderboard |
-| GET | `/api/leaderboard` | All-time leaderboard sorted by fastest lap |
+**Admin auth:** `Authorization: Bearer <token>` — obtain token via `POST /auth/login`, store in localStorage.
 
-`GET /api/admin/queue` response shape:
+**Bridge auth:** `X-Bridge-Api-Key` header (backend-to-backend, not used by frontend).
+
+**Public endpoints** (user-web, user-monitor): no auth required.
+
+---
+
+### Authentication
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| POST | `/auth/login` | none | Get admin JWT |
+
 ```json
+// POST /auth/login — request
+{ "username": "string", "password": "string" }
+
+// POST /auth/login — response 200
+{ "token": "string", "expiresAt": "ISO8601" }
+```
+
+---
+
+### Admin — Queue
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| GET | `/api/admin/queue` | Bearer | All attendees with status |
+| POST | `/api/admin/queue/{attendeeId}/skip` | Bearer | Move attendee to back of queue → 204 |
+
+```json
+// GET /api/admin/queue — response 200
 [
   {
-    "attendeeId": "string",
+    "attendeeId": "uuid",
     "firstName": "string",
     "lastName": "string",
     "email": "string",
@@ -178,13 +194,88 @@ Auth: `X-Api-Key` header on all admin routes.
 ]
 ```
 
-`GET /api/leaderboard` response shape:
+---
+
+### Admin — Session
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| POST | `/api/admin/session/start` | Bearer | Start session → 201 SessionResponse |
+| POST | `/api/admin/session/stop` | Bearer | End session, lap time records → 200 SessionResponse |
+| POST | `/api/admin/session/pause` | Bearer | Pause active session → 200 SessionResponse |
+| POST | `/api/admin/session/resume` | Bearer | Resume paused session → 200 SessionResponse |
+| GET | `/api/admin/session/active` | Bearer | Active session or 204 |
+| GET | `/api/admin/session/{sessionId}` | Bearer | Session by id → 200 SessionResponse |
+| DELETE | `/api/admin/session/{sessionId}` | Bearer | Cancel session, no time recorded → 200 SessionResponse |
+
 ```json
+// POST /api/admin/session/start — request
+{ "attendeeId": "uuid" }
+
+// SessionResponse (used by start/stop/pause/resume/get/delete)
+{
+  "sessionId": "uuid",
+  "attendeeId": "uuid",
+  "attendeeFirstName": "string",
+  "attendeeLastName": "string",
+  "ticketNumber": "string",
+  "status": "string",
+  "startedAt": "ISO8601",
+  "endedAt": "ISO8601 | null",
+  "durationSeconds": 0,
+  "bestLapMs": 0,
+  "bestLapFormatted": "string",
+  "lapsCompleted": 0,
+  "bridgeDataReceived": false,
+  "isPaused": false
+}
+```
+
+---
+
+### Admin — Attendees
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| PUT | `/api/admin/attendee/{attendeeId}` | Bearer | Edit personal details → 204 |
+| DELETE | `/api/admin/attendee/{attendeeId}` | Bearer | Remove attendee entirely → 204 |
+
+```json
+// PUT /api/admin/attendee/{attendeeId} — request
+{ "firstName": "string", "lastName": "string", "email": "string" }
+```
+
+---
+
+### Admin — Leaderboard
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| PUT | `/api/admin/leaderboard/{sessionId}` | Bearer | Override lap time → 200 SessionResponse |
+| DELETE | `/api/admin/leaderboard/{sessionId}` | Bearer | Remove leaderboard entry → 204 |
+
+```json
+// PUT /api/admin/leaderboard/{sessionId} — request
+{ "bestLapMs": 0 }
+```
+
+Note: `sessionId === attendeeId` (one session per attendee, enforced at DB level).
+
+---
+
+### Public — Leaderboard
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| GET | `/api/leaderboard` | none | All-time leaderboard sorted by fastest lap |
+
+```json
+// GET /api/leaderboard — response 200
 {
   "entries": [
     {
       "rank": 0,
-      "attendeeId": "string",
+      "attendeeId": "uuid",
       "firstName": "string",
       "lastName": "string",
       "ticketNumber": "string",
@@ -194,6 +285,77 @@ Auth: `X-Api-Key` header on all admin routes.
     }
   ]
 }
+```
+
+---
+
+### Public — Queue Display
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| GET | `/api/queue/display` | none | Live queue state for user-monitor |
+| GET | `/api/queue/wait-estimate` | none | Estimated wait in seconds (integer) |
+
+```json
+// GET /api/queue/display — response 200
+{
+  "currentDriver": { "firstName": "string", "lastName": "string", "ticketNumber": "string" },
+  "nextDriver":    { "firstName": "string", "lastName": "string", "ticketNumber": "string" },
+  "previousDriver":{ "firstName": "string", "lastName": "string", "ticketNumber": "string" },
+  "waitingQueue": [
+    { "firstName": "string", "lastName": "string", "ticketNumber": "string" }
+  ],
+  "waitingCount": 0,
+  "estimatedWaitSeconds": 0
+}
+```
+
+Note: `currentDriver`, `nextDriver`, `previousDriver` are `null` when no one is in that state. `QueueDriverDto` does **not** include `attendeeId`.
+
+---
+
+### Public — Registration
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| POST | `/api/registration` | none | Register attendee → 202 |
+| GET | `/api/registration/confirm?token={token}` | none | Confirm email → 200 |
+| DELETE | `/api/registration/{attendeeId}` | none | Cancel queue spot → 204 |
+
+```json
+// POST /api/registration — request
+{ "firstName": "string", "lastName": "string", "email": "string" }
+
+// POST /api/registration — response 202
+{
+  "attendeeId": "uuid",
+  "message": "string",
+  "confirmationToken": "string"
+}
+
+// GET /api/registration/confirm — response 200
+{
+  "attendeeId": "uuid",
+  "firstName": "string",
+  "lastName": "string",
+  "ticketNumber": "string",
+  "queuePosition": 0,
+  "estimatedWaitSeconds": 0
+}
+```
+
+---
+
+### Bridge (backend-to-backend only)
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| GET | `/api/bridge/session/active` | X-Bridge-Api-Key | Active session for timing system |
+| POST | `/api/bridge/session/{sessionId}/lap-data` | X-Bridge-Api-Key | Push lap data from timing system → 204 |
+
+```json
+// POST /api/bridge/session/{sessionId}/lap-data — request
+{ "bestLapMs": 0, "lapsCompleted": 0 }
 ```
 
 ## Registration Confirmation Flow
@@ -210,7 +372,7 @@ Auth: `X-Api-Key` header on all admin routes.
 
 ```
 POST /api/admin/queue/swap
-Auth: X-Api-Key
+Auth: Authorization: Bearer <token>
 Body: { "attendeeIdA": "string", "attendeeIdB": "string" }
 Response: 200 OK (no body) | 400 if either attendeeId not found or not in waiting status
 ```
