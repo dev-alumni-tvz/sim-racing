@@ -115,10 +115,10 @@ function AdminApp() {
   }, [seconds])
 
   useEffect(() => {
-    if (DEMO_MODE || seconds !== 0 || !activeSession || stopSessionMutation.isPending || autoStopFired.current) return
+    if (DEMO_MODE || seconds !== 0 || !activeSession || isPaused || stopSessionMutation.isPending || autoStopFired.current) return
     autoStopFired.current = true
     handleFinish()
-  }, [seconds, activeSession, stopSessionMutation.isPending])
+  }, [seconds, activeSession, isPaused, stopSessionMutation.isPending])
 
   const monitorBase = import.meta.env.VITE_MONITOR_URL ?? 'http://localhost:5175'
   const monitorSrc = DEMO_MODE ? `${monitorBase}?visual=1` : monitorBase
