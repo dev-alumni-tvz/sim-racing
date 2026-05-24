@@ -73,9 +73,15 @@ export function useCancelSession() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (sessionId: string) => cancelSession(sessionId),
+    onMutate: () => {
+      qc.setQueryData(['activeSession'], null)
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['activeSession'] })
       qc.invalidateQueries({ queryKey: ['adminQueue'] })
+    },
+    onError: () => {
+      qc.invalidateQueries({ queryKey: ['activeSession'] })
     },
   })
 }
