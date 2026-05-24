@@ -2,6 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   startSession,
   stopSession,
+  pauseSession,
+  resumeSession,
   skipAttendee,
   cancelSession,
   editAttendee,
@@ -30,7 +32,24 @@ export function useStopSession() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['activeSession'] })
       qc.invalidateQueries({ queryKey: ['adminQueue'] })
+      qc.invalidateQueries({ queryKey: ['leaderboard'] })
     },
+  })
+}
+
+export function usePauseSession() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: pauseSession,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['activeSession'] }),
+  })
+}
+
+export function useResumeSession() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: resumeSession,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['activeSession'] }),
   })
 }
 

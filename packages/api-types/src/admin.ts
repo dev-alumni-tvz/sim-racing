@@ -21,6 +21,19 @@ export interface ActiveSessionResponse {
   attendeeFirstName: string
   attendeeLastName: string
   startedAt: string
+  isPaused: boolean
+}
+
+// POST /api/admin/session/pause
+export interface PauseSessionResponse {
+  sessionId: string
+  isPaused: true
+}
+
+// POST /api/admin/session/resume
+export interface ResumeSessionResponse {
+  sessionId: string
+  isPaused: false
 }
 
 // POST /api/admin/session/start

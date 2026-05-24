@@ -236,11 +236,39 @@
     transition: opacity 0.15s;
 }
 
-.btnNextPlayer:hover {
+.btnNextPlayer:hover:not(:disabled) {
     opacity: 0.85;
 }
 
-.btnPause {
+.btnNextPlayer:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btnFinish {
+    width: 86px;
+    height: 56px;
+    background: #3b82f6;
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 18px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.btnFinish:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.btnFinish:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btnPauseToggle {
     width: 86px;
     height: 56px;
     background: var(--color-btn-red);
@@ -249,36 +277,139 @@
     color: #ffffff;
     font-family: var(--font-ui);
     font-weight: 700;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
     transition: opacity 0.15s;
 }
 
-.btnPause:hover {
+.btnPauseToggle:hover:not(:disabled) {
     opacity: 0.85;
 }
 
-.btnCancel {
+.btnPauseToggle:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btnResume {
     width: 86px;
     height: 56px;
+    background: var(--color-btn-green);
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 18px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.btnResume:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.btnResume:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btnDelete {
+    width: 86px;
+    height: 56px;
+    background: var(--color-btn-red);
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    letter-spacing: 0.04em;
+}
+
+.btnDelete:hover:not(:disabled) {
+    opacity: 0.85;
+}
+
+.btnDelete:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Confirmation dialog */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.dialog {
+    background: var(--color-card);
+    border: 1px solid var(--color-border-dark);
+    border-radius: 10px;
+    padding: 28px 32px;
+    max-width: 380px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.dialogTitle {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--color-text-primary);
+    text-align: center;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.dialogActions {
+    display: flex;
+    gap: 12px;
+}
+
+.btnDialogYes {
+    flex: 1;
+    height: 44px;
+    background: var(--color-btn-red);
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.btnDialogYes:hover {
+    opacity: 0.85;
+}
+
+.btnDialogNo {
+    flex: 1;
+    height: 44px;
     background: var(--color-btn-dark);
     border: 1px solid var(--color-border-dark);
     border-radius: 6px;
     color: var(--color-text-soft);
     font-family: var(--font-ui);
     font-weight: 700;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
     transition: opacity 0.15s;
 }
 
-.btnCancel:hover:not(:disabled) {
+.btnDialogNo:hover {
     opacity: 0.85;
-}
-
-.btnCancel:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
 }
 
 /* Queue panel */

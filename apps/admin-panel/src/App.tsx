@@ -5,7 +5,7 @@ import { useTimerStore, formatTime } from './timerStore'
 import { useLeaderboard } from './hooks/useLeaderboard'
 import { useAdminQueue } from './hooks/useAdminQueue'
 import { useActiveSession } from './hooks/useActiveSession'
-import { useStartSession, useStopSession, useCancelSession } from './hooks/useSessionMutations'
+import { useStartSession, useStopSession, usePauseSession, useResumeSession, useCancelSession } from './hooks/useSessionMutations'
 import { useSignalR } from './hooks/useSignalR'
 import { useAdminSimulation } from './hooks/useAdminSimulation'
 import { QueuePanel } from './components/QueuePanel'
@@ -52,6 +52,7 @@ export default function App() {
 function AdminApp() {
   const { seconds, isRunning, start, pause, reset, addTime } = useTimerStore()
   const now = useClock()
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const simMode = SIM_MODE ? 'sim' : VISUAL_MODE ? 'visual' : 'off'
   const simData = useAdminSimulation(simMode)
@@ -66,9 +67,12 @@ function AdminApp() {
   const activeSession = simData?.activeSession ?? liveSession ?? null
   const displaySeconds = simData?.timerSeconds ?? seconds
   const displayRunning = simData?.isTimerRunning ?? isRunning
+  const isPaused = activeSession?.isPaused ?? false
 
   const startSessionMutation = useStartSession()
   const stopSessionMutation = useStopSession()
+  const pauseSessionMutation = usePauseSession()
+  const resumeSessionMutation = useResumeSession()
   const cancelSessionMutation = useCancelSession()
 
   function handleNextPlayer() {
@@ -81,12 +85,36 @@ function AdminApp() {
     }
   }
 
-  function handleStop() {
+  function handleFinish() {
     if (DEMO_MODE) return
     stopSessionMutation.mutate()
     pause()
     reset()
   }
+
+  function handlePauseResume() {
+    if (DEMO_MODE) return
+    if (isPaused) {
+      resumeSessionMutation.mutate()
+      start()
+    } else {
+      pauseSessionMutation.mutate()
+      pause()
+    }
+  }
+
+  function handleDeleteConfirm() {
+    if (DEMO_MODE || !activeSession) return
+    cancelSessionMutation.mutate(activeSession.sessionId)
+    setShowDeleteConfirm(false)
+    pause()
+    reset()
+  }
+
+  useEffect(() => {
+    if (DEMO_MODE || seconds !== 0 || !activeSession || stopSessionMutation.isPending) return
+    handleFinish()
+  }, [seconds, activeSession])
 
   const monitorBase = import.meta.env.VITE_MONITOR_URL ?? 'http://localhost:5175'
   const monitorSrc = DEMO_MODE ? `${monitorBase}?visual=1` : monitorBase
@@ -144,26 +172,44 @@ function AdminApp() {
           <button
             className={styles.btnNextPlayer}
             onClick={handleNextPlayer}
-            disabled={DEMO_MODE || startSessionMutation.isPending}
+            disabled={DEMO_MODE || !!activeSession || startSessionMutation.isPending}
           >
             NEXT PLAYER
           </button>
           <button
-            className={styles.btnPause}
-            onClick={handleStop}
+            className={styles.btnFinish}
+            onClick={handleFinish}
             disabled={DEMO_MODE || !activeSession || stopSessionMutation.isPending}
           >
-            STOP
+            FINISH
           </button>
           <button
-            className={styles.btnCancel}
-            onClick={() => !DEMO_MODE && activeSession && cancelSessionMutation.mutate(activeSession.sessionId)}
-            disabled={DEMO_MODE || !activeSession || cancelSessionMutation.isPending}
-            title="Cancel session — removes player, no time recorded"
+            className={isPaused ? styles.btnResume : styles.btnPauseToggle}
+            onClick={handlePauseResume}
+            disabled={DEMO_MODE || !activeSession || pauseSessionMutation.isPending || resumeSessionMutation.isPending}
           >
-            CANCEL
+            {isPaused ? 'RESUME' : 'PAUSE'}
+          </button>
+          <button
+            className={styles.btnDelete}
+            onClick={() => !DEMO_MODE && activeSession && setShowDeleteConfirm(true)}
+            disabled={DEMO_MODE || !activeSession || cancelSessionMutation.isPending}
+          >
+            DELETE
           </button>
         </div>
+
+        {showDeleteConfirm && (
+          <div className={styles.overlay}>
+            <div className={styles.dialog}>
+              <p className={styles.dialogTitle}>Are you sure you want to delete this driving session?</p>
+              <div className={styles.dialogActions}>
+                <button className={styles.btnDialogYes} onClick={handleDeleteConfirm}>Yes</button>
+                <button className={styles.btnDialogNo} onClick={() => setShowDeleteConfirm(false)}>No</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <QueuePanel
           queueEntries={queueEntries}

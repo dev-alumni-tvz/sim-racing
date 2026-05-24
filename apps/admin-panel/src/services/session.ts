@@ -3,6 +3,8 @@ import type {
   StartSessionRequest,
   StartSessionResponse,
   StopSessionResponse,
+  PauseSessionResponse,
+  ResumeSessionResponse,
   SkipAttendeeResponse,
   CancelSessionResponse,
   EditAttendeeRequest,
@@ -24,6 +26,14 @@ export function startSession(body: StartSessionRequest): Promise<StartSessionRes
 
 export function stopSession(): Promise<StopSessionResponse> {
   return apiFetch<StopSessionResponse>('/api/admin/session/stop', { method: 'POST' })
+}
+
+export function pauseSession(): Promise<PauseSessionResponse> {
+  return apiFetch<PauseSessionResponse>('/api/admin/session/pause', { method: 'POST' })
+}
+
+export function resumeSession(): Promise<ResumeSessionResponse> {
+  return apiFetch<ResumeSessionResponse>('/api/admin/session/resume', { method: 'POST' })
 }
 
 export function skipAttendee(attendeeId: string): Promise<SkipAttendeeResponse> {

@@ -10,6 +10,7 @@ type Session = {
   name: string
   ticketNumber: string
   startedAt: string
+  isPaused: boolean
 } | null
 
 function transform(data: ActiveSessionResponse | null): Session {
@@ -20,6 +21,7 @@ function transform(data: ActiveSessionResponse | null): Session {
     name: fullName(data.attendeeFirstName, data.attendeeLastName),
     ticketNumber: data.ticketNumber,
     startedAt: data.startedAt,
+    isPaused: data.isPaused ?? false,
   }
 }
 
