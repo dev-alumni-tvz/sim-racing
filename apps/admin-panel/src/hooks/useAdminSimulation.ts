@@ -48,6 +48,7 @@ type ActiveSession = {
   name: string
   ticketNumber: string
   startedAt: string
+  isPaused: boolean
 } | null
 
 const DRIVERS: QueueEntry[] = [
@@ -116,6 +117,7 @@ export function useAdminSimulation(mode: 'sim' | 'visual' | 'off') {
         name: DRIVERS[activeDriverIdx].name,
         ticketNumber: DRIVERS[activeDriverIdx].ticketNumber,
         startedAt: new Date().toISOString(),
+        isPaused: false,
       }
     : null
 
