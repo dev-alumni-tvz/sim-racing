@@ -49,7 +49,7 @@ export default function App() {
 }
 
 function AdminApp() {
-  const { seconds, isRunning, start, pause, reset, addTime } = useTimerStore()
+  const { seconds, start, pause, reset, addTime } = useTimerStore()
   const now = useClock()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const autoStopFired = useRef(false)
@@ -65,7 +65,6 @@ function AdminApp() {
   const queueEntries = simData?.queueEntries ?? liveQueue
   const activeSession = simData?.activeSession ?? liveSession ?? null
   const displaySeconds = simData?.timerSeconds ?? seconds
-  const displayRunning = simData?.isTimerRunning ?? isRunning
   const isPaused = activeSession?.isPaused ?? false
 
   const startSessionMutation = useStartSession()
@@ -149,8 +148,12 @@ function AdminApp() {
               <button className={styles.btnOffset} onClick={() => addTime(-60)} disabled={DEMO_MODE}>-1m</button>
               <button className={styles.btnOffset} onClick={() => addTime(-10)} disabled={DEMO_MODE}>-10s</button>
               <button className={styles.btnOffset} onClick={() => addTime(-1)} disabled={DEMO_MODE}>-1s</button>
-              <button className={styles.btnPlayPause} onClick={DEMO_MODE ? undefined : (displayRunning ? pause : start)} disabled={DEMO_MODE}>
-                {displayRunning ? '⏸' : '▶'}
+              <button
+                className={styles.btnPlayPause}
+                onClick={handlePauseResume}
+                disabled={DEMO_MODE || !activeSession || pauseSessionMutation.isPending || resumeSessionMutation.isPending}
+              >
+                {isPaused ? '▶' : '⏸'}
               </button>
               <button className={styles.btnOffset} onClick={() => addTime(1)} disabled={DEMO_MODE}>+1s</button>
               <button className={styles.btnOffset} onClick={() => addTime(10)} disabled={DEMO_MODE}>+10s</button>
