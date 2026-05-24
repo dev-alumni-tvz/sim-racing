@@ -62,6 +62,14 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
   // Use optimistic local order while a swap is in flight; fall back to server order
   const waitingEntries = localOrder ?? waitingFromServer
 
+  // Played section: all 'done' queue entries, enriched with leaderboard data where available
+  const leaderboardById = new Map(playedEntries.map((e) => [e.attendeeId, e]))
+  const doneEntries = queueEntries.filter((e) => e.status === 'done')
+  const withLb = doneEntries.filter((e) => leaderboardById.has(e.attendeeId))
+    .sort((a, b) => leaderboardById.get(a.attendeeId)!.playOrder - leaderboardById.get(b.attendeeId)!.playOrder)
+  const withoutLb = doneEntries.filter((e) => !leaderboardById.has(e.attendeeId))
+  const playedRows = [...withLb, ...withoutLb]
+
   function handleDragStart(idx: number) {
     dragIdx.current = idx
   }
@@ -110,20 +118,26 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
       <div className={styles.scroll}>
         <div className={styles.section}>
           <p className={styles.sectionLabel}>Played</p>
-          {playedEntries.length > 0 ? playedEntries.map((e) => (
-            <button
-              key={e.attendeeId}
-              className={styles.row}
-              onClick={() => setModal({ type: 'leaderboard', entry: e })}
-            >
-              <span className={styles.playOrder}>{e.playOrder}.</span>
-              <span className={styles.name}>{e.name}</span>
-              <span className={styles.ticket}>#{e.ticketNumber}</span>
-              <span className={styles.rank}>P{e.rank}</span>
-              <span className={styles.gap}>{e.gap ?? '—'}</span>
-              <span className={styles.lapTime}>{e.lapTime}</span>
-            </button>
-          )) : (
+          {playedRows.length > 0 ? playedRows.map((qe, idx) => {
+            const lb = leaderboardById.get(qe.attendeeId)
+            return (
+              <button
+                key={qe.attendeeId}
+                className={styles.row}
+                onClick={() => lb
+                  ? setModal({ type: 'leaderboard', entry: lb })
+                  : setModal({ type: 'queue', entry: qe })
+                }
+              >
+                <span className={styles.playOrder}>{idx + 1}.</span>
+                <span className={styles.name}>{qe.name}</span>
+                <span className={styles.ticket}>#{qe.ticketNumber}</span>
+                <span className={styles.rank}>{lb ? `P${lb.rank}` : '—'}</span>
+                <span className={styles.gap}>{lb ? (lb.gap ?? '—') : '—'}</span>
+                <span className={styles.lapTime}>{lb ? lb.lapTime : '—'}</span>
+              </button>
+            )
+          }) : (
             <div className={styles.emptyRow}>&nbsp;</div>
           )}
         </div>
