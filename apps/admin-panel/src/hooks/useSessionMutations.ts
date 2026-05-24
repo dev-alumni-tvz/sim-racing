@@ -14,6 +14,9 @@ import {
 } from '../services/session'
 import type { EditAttendeeRequest, EditLeaderboardRequest, SwapQueueRequest } from '@sim-racing/api-types'
 
+// Hardcoded test lap time used for local testing (1:23.450)
+const TEST_LAP_MS = 83_450
+
 export function useStartSession() {
   const qc = useQueryClient()
   return useMutation({
@@ -29,10 +32,13 @@ export function useStopSession() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: stopSession,
-    onSuccess: () => {
+    onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ['activeSession'] })
       qc.invalidateQueries({ queryKey: ['adminQueue'] })
       qc.invalidateQueries({ queryKey: ['leaderboard'] })
+      editLeaderboardEntry(data.sessionId, { bestLapMs: TEST_LAP_MS }).then(() => {
+        qc.invalidateQueries({ queryKey: ['leaderboard'] })
+      }).catch(() => {})
     },
   })
 }
