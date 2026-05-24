@@ -4,7 +4,7 @@ import type { QueueDisplayResponse } from '@sim-racing/api-types'
 import { fullName, ticketToPosition } from '@sim-racing/api-types'
 import { fetchQueueDisplay } from '../services/queueDisplay'
 
-const MAX_WAITING = 8 // total 10 minus current driver and next up
+const MAX_WAITING = 25
 
 function nextFullHour(): string {
   const now = new Date()
@@ -61,7 +61,9 @@ function transform(data: QueueDisplayResponse) {
           queueNumber: ticketToPosition(data.previousDriver.ticketNumber),
         }
       : null,
-    waitingQueue: data.waitingQueue,
+    waitingQueue: data.waitingQueue.filter(
+      (s) => s.ticketNumber !== data.nextDriver?.ticketNumber
+    ),
     waitingCount: data.waitingCount,
     freeSlots,
     newSlotsAt: nextFullHour(),

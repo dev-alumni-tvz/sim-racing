@@ -49,21 +49,23 @@ export const QueueDisplay: FC<QueueDisplayProps> = ({
 
   return (
     <div className={styles.grid}>
-      {waitingQueue.map((slot) => (
+      {waitingQueue.slice(0, 10).map((slot) => (
         <div key={slot.ticketNumber} className={styles.tile}>
           <span className={styles.tileNumber}>{formatTicket(slot.ticketNumber)}</span>
         </div>
       ))}
 
-      <div className={styles.infoTileFree}>
-        <span className={styles.infoTileLabel}>Free slots available:</span>
-        <span className={styles.infoTileValue}>{freeSlots}</span>
-      </div>
-
-      <div className={styles.infoTileNew}>
-        <span className={styles.infoTileLabel}>New slots open at:</span>
-        <span className={styles.infoTileValue}>{newSlotsAt ?? '—'}</span>
-      </div>
+      {freeSlots > 0 ? (
+        <div className={styles.infoTileFree}>
+          <span className={styles.infoTileLabel}>Free slots available:</span>
+          <span className={styles.infoTileValue}>{freeSlots}</span>
+        </div>
+      ) : (
+        <div className={styles.infoTileNew}>
+          <span className={styles.infoTileLabel}>New slots open at:</span>
+          <span className={styles.infoTileValue}>{newSlotsAt ?? '—'}</span>
+        </div>
+      )}
     </div>
   )
 }
