@@ -196,6 +196,14 @@ Auth: `X-Api-Key` header on all admin routes.
 }
 ```
 
+## Registration Confirmation Flow
+
+1. User submits form → `POST /api/registration` → `202` → backend sends confirmation email
+2. User clicks email link → `GET /api/registration/confirm?token=xxx` → attendee moves from `pending` to `waiting`
+3. Frontend shows `ConfirmationPage` (loading → success/error)
+4. Success response **must include `firstName` and `lastName`** — user may open the link on a different device/browser than they registered on, so localStorage name is not reliable
+5. Frontend shows `ticketNumber` (not `queuePosition`) on the TicketCard — ticketNumber is the stable user-facing identity
+
 ## Backend Requirements (for backend dev)
 
 ### New endpoint needed: Queue Swap
@@ -217,8 +225,8 @@ Response: 200 OK (no body) | 400 if either attendeeId not found or not in waitin
 
 - **Attendee** — a person who has registered via the user-web app. Has a `ticketNumber` and `attendeeId`.
 - **Session** — a single driving run for an attendee. `sessionId === attendeeId` (one attempt per day enforced at DB level).
-- **ticketNumber** — the visible queue number shown to the attendee (e.g. "007"). Does not change even if drive order is reordered.
-- **queuePosition** — the driving order position. Changes when admin reorders the queue via swap.
+- **ticketNumber** — the visible queue number shown to the attendee (e.g. "007"). Stable string, assigned at registration, ranges 000–999, ~80 contestants expected. Does not change even if drive order is reordered. Always shown to the user as their identity token. Frontend parses it to int for `TicketCard` display.
+- **queuePosition** — the driving order position within the active queue (max 25 slots). Changes when admin reorders. Not shown to users — internal ordering only.
 - **Played** — an attendee who has completed a session and has a recorded lap time on the leaderboard. Determined by presence in `/api/leaderboard` with `completedAt` date = today.
 - **Waiting** — an attendee in the queue who has not yet driven. Status `'waiting'` on the queue endpoint.
 - **Current Driver** — attendee with status `'driving'`. Only one at a time, enforced at DB level.
