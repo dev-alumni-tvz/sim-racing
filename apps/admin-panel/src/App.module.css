@@ -27,7 +27,7 @@
 
 .layout {
     display: grid;
-    grid-template-columns: 433px 814px 607px;
+    grid-template-columns: 1fr 1.9fr 1.4fr;
     height: 100vh;
     overflow: hidden;
     border-top: 1px solid var(--color-border-dark);
@@ -47,6 +47,26 @@
     height: 100%;
     padding: 16px 12px;
     overflow: hidden;
+}
+
+.leaderboardScroll {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-scrollbar) var(--color-divider);
+}
+
+.leaderboardScroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.leaderboardScroll::-webkit-scrollbar-track {
+    background: var(--color-divider);
+}
+
+.leaderboardScroll::-webkit-scrollbar-thumb {
+    background: var(--color-scrollbar);
+    border-radius: 3px;
 }
 
 .panelTitle {

@@ -102,7 +102,9 @@ function AdminApp() {
       {/* ---- Left: All-time leaderboard ---- */}
       <aside className={styles.allTimePanel}>
         <p className={styles.panelTitle}>All Time Leaderboard</p>
-        <LeaderboardTable rows={leaderboardRows} size="sm" maxHeight={900} />
+        <div className={styles.leaderboardScroll}>
+          <LeaderboardTable rows={leaderboardRows} size="sm" />
+        </div>
       </aside>
 
       {/* ---- Centre: Timer + controls + queue ---- */}

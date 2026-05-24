@@ -3,26 +3,29 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #0a0a0a;
+  background: var(--color-bg);
 }
 
 .card {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  background: #141414;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  padding: 40px 48px;
+  gap: 16px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 8px;
+  padding: 32px;
   width: 360px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .title {
-  font-size: 22px;
+  font-family: var(--font-ui);
+  font-size: 16px;
   font-weight: 700;
-  color: #fff;
-  margin: 0 0 8px;
-  text-align: center;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 4px;
 }
 
 .field {
@@ -32,26 +35,30 @@
 }
 
 .label {
-  font-size: 13px;
-  font-weight: 500;
-  color: #888;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-label);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .input {
-  background: #1e1e1e;
-  border: 1px solid #333;
-  border-radius: 6px;
-  color: #fff;
-  font-size: 15px;
-  padding: 10px 14px;
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-dark);
+  border-radius: 4px;
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  box-sizing: border-box;
   outline: none;
   transition: border-color 0.15s;
 }
 
 .input:focus {
-  border-color: #e35b00;
+  border-color: var(--color-btn-primary);
 }
 
 .input:disabled {
@@ -59,27 +66,28 @@
 }
 
 .error {
-  font-size: 13px;
-  color: #f44;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-error);
   margin: 0;
-  text-align: center;
 }
 
 .btn {
   margin-top: 4px;
-  background: #e35b00;
-  color: #fff;
+  background: var(--color-cta-yellow);
+  color: #000;
   border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 12px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: opacity 0.15s;
 }
 
 .btn:hover:not(:disabled) {
-  background: #ff6a0f;
+  opacity: 0.85;
 }
 
 .btn:disabled {
