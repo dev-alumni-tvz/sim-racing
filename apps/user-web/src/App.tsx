@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './App.module.css';
 import { LeaderboardTable, TicketCard } from '@sim-racing/ui';
 import { useLeaderboard } from './hooks/useLeaderboard';
 import { useSimulation } from './hooks/useSimulation';
+import { useConfirmToken } from './hooks/useConfirmToken';
+import { usePersistedTicket } from './hooks/usePersistedTicket';
 import type { RegistrationResponse } from '@sim-racing/api-types';
 import { JoinQueueModal } from './components/JoinQueueModal';
+import { ConfirmationPage } from './components/ConfirmationPage';
 
 const SIM_MODE = new URLSearchParams(window.location.search).get('sim') === '1';
 const VISUAL_MODE = new URLSearchParams(window.location.search).get('visual') === '1';
@@ -20,18 +23,48 @@ const VISUAL_TICKET: TicketState = { name: 'Demo Korisnik', queueNumber: 4, esti
 export default function App() {
 	const [search, setSearch] = useState('');
 	const [modalOpen, setModalOpen] = useState(false);
-	const [liveTicket, setLiveTicket] = useState<TicketState | null>(null);
+	const [showConfirmPage, setShowConfirmPage] = useState(() =>
+		!!new URLSearchParams(window.location.search).get('confirmationToken')
+	);
+
+	const { stored, registerPending, confirmTicket } = usePersistedTicket();
+	const { data: confirmData, isLoading: confirmLoading, isError: confirmError, hasToken } = useConfirmToken();
+
+	useEffect(() => {
+		if (!confirmData) return;
+		const name = [confirmData.firstName, confirmData.lastName].filter(Boolean).join(' ') || stored?.name;
+		confirmTicket(confirmData.queuePosition, Math.ceil(confirmData.estimatedWaitSeconds / 60), name);
+	}, [confirmData]);
+
+	if (showConfirmPage && hasToken) {
+		return (
+			<ConfirmationPage
+				isLoading={confirmLoading}
+				isError={confirmError}
+				confirmData={confirmData}
+				storedName={stored?.name}
+				onContinue={() => setShowConfirmPage(false)}
+			/>
+		);
+	}
 
 	const { data: liveRows } = useLeaderboard(!SIM_MODE, VISUAL_MODE);
 	const { rows: simRows, ticket: simTicket, join: simJoin } = useSimulation(SIM_MODE);
 
+	const persistedTicket: TicketState | null = stored ? {
+		name: stored.name,
+		queueNumber: stored.status === 'confirmed' ? stored.queueNumber : undefined,
+		estimatedWaitMinutes: stored.status === 'confirmed' ? stored.estimatedWaitMinutes : undefined,
+	} : null;
+
 	const rows = SIM_MODE ? simRows : (liveRows ?? []);
-	const ticket = SIM_MODE ? simTicket : VISUAL_MODE ? VISUAL_TICKET : liveTicket;
+	const ticket = SIM_MODE ? simTicket : VISUAL_MODE ? VISUAL_TICKET : persistedTicket;
+	const isTicketPending = !SIM_MODE && !VISUAL_MODE && stored?.status === 'pending';
 
 	const filtered = search ? rows.filter((r) => r.name.toLowerCase().includes(search.toLowerCase())) : rows;
 
-	function handleSuccess(_data: RegistrationResponse, firstName: string, lastName: string) {
-		setLiveTicket({ name: `${firstName} ${lastName}` });
+	function handleSuccess(data: RegistrationResponse, firstName: string, lastName: string) {
+		registerPending(data.attendeeId, `${firstName} ${lastName}`);
 		setModalOpen(false);
 	}
 
@@ -61,7 +94,7 @@ export default function App() {
 					Prijavi se, odvezi svoj najbolji krug i<br />
 					popni se na leaderboard.
 				</p>
-				{!ticket && !VISUAL_MODE && (
+				{!ticket && !VISUAL_MODE && !hasToken && (
 					<button
 						className={styles.joinBtn}
 						onClick={() => (SIM_MODE ? simJoin() : setModalOpen(true))}
@@ -77,6 +110,7 @@ export default function App() {
 						queueNumber={ticket.queueNumber}
 						name={ticket.name}
 						estimatedWaitMinutes={ticket.estimatedWaitMinutes}
+						pendingLabel={isTicketPending ? 'Confirm your email\nto get your queue number' : undefined}
 					/>
 				</div>
 			)}

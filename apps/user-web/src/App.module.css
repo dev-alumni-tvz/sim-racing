@@ -87,6 +87,18 @@
     opacity: 0.9;
 }
 
+.confirmingText {
+    color: #aaa;
+    font-size: 15px;
+    margin-top: 16px;
+}
+
+.confirmErrorText {
+    color: #f55;
+    font-size: 15px;
+    margin-top: 16px;
+}
+
 .heroSeparator {
     width: 333px;
     height: 1px;

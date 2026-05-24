@@ -17,6 +17,8 @@ export interface ConfirmRegistrationResponse {
   ticketNumber: string
   queuePosition: number
   estimatedWaitSeconds: number
+  firstName?: string
+  lastName?: string
 }
 
 export interface RegistrationConflictResponse {

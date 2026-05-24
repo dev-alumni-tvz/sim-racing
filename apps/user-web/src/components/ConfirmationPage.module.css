@@ -1,0 +1,171 @@
+.page {
+  max-width: 375px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---- Navbar (mirrors App.module.css) ---- */
+.navbar {
+  height: 65px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--color-border-dark);
+  flex-shrink: 0;
+}
+
+.navLogo {
+  height: 26px;
+  width: auto;
+}
+
+.navLogoSponsor {
+  height: 21px;
+  width: auto;
+}
+
+.navDivider {
+  display: block;
+  width: 30px;
+  height: 0;
+  border-top: 1px solid rgba(46, 51, 74, 1);
+  transform: rotate(-67.85deg);
+  flex-shrink: 0;
+}
+
+/* ---- Main content area ---- */
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  width: 100%;
+}
+
+/* ---- Loading state ---- */
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border-dark);
+  border-top-color: var(--color-cta-yellow);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingText {
+  font-family: var(--font-mobile);
+  font-size: 16px;
+  color: var(--color-text-placeholder);
+}
+
+/* ---- Error state ---- */
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.errorIcon {
+  font-size: 40px;
+  color: var(--color-error);
+  line-height: 1;
+}
+
+.errorTitle {
+  font-family: var(--font-mobile);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.errorSubtitle {
+  font-family: var(--font-mobile);
+  font-size: 15px;
+  color: var(--color-text-placeholder);
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+/* ---- Success state ---- */
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  width: 100%;
+}
+
+.successIcon {
+  font-size: 40px;
+  color: var(--color-cta-yellow);
+  line-height: 1;
+}
+
+.successTitle {
+  font-family: var(--font-mobile);
+  font-weight: 700;
+  font-size: 36px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.accent {
+  color: var(--color-cta-yellow);
+}
+
+.successSubtitle {
+  font-family: var(--font-mobile);
+  font-size: 16px;
+  color: var(--color-text-placeholder);
+  margin: 0 0 8px;
+}
+
+.ticketWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 4px;
+}
+
+/* ---- Shared button ---- */
+.btn {
+  width: 100%;
+  max-width: 280px;
+  height: 43px;
+  background: var(--color-cta-yellow);
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  font-family: var(--font-mobile);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-top: 8px;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
