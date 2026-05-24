@@ -388,7 +388,7 @@ Response: 200 OK (no body) | 400 if either attendeeId not found or not in waitin
 - **Attendee** — a person who has registered via the user-web app. Has a `ticketNumber` and `attendeeId`.
 - **Session** — a single driving run for an attendee. `sessionId === attendeeId` (one attempt per day enforced at DB level).
 - **ticketNumber** — the visible queue number shown to the attendee (e.g. "007"). Stable string, assigned at registration, ranges 000–999, ~80 contestants expected. Does not change even if drive order is reordered. Always shown to the user as their identity token. Frontend parses it to int for `TicketCard` display.
-- **queuePosition** — the driving order position within the active queue (max 25 slots). Changes when admin reorders. Not shown to users — internal ordering only.
+- **queuePosition** — the driving order position within the active queue (max 15 slots). Changes when admin reorders. Not shown to users — internal ordering only.
 - **Played** — an attendee who has completed a session and has a recorded lap time on the leaderboard. Determined by presence in `/api/leaderboard` with `completedAt` date = today.
 - **Waiting** — an attendee in the queue who has not yet driven. Status `'waiting'` on the queue endpoint.
 - **Current Driver** — attendee with status `'driving'`. Only one at a time, enforced at DB level.
