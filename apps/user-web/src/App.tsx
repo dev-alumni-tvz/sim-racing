@@ -23,7 +23,7 @@ const VISUAL_TICKET: TicketState = { name: 'Demo Korisnik', queueNumber: 4, esti
 export default function App() {
 	const [search, setSearch] = useState('');
 	const [modalOpen, setModalOpen] = useState(false);
-	const [showConfirmPage, setShowConfirmPage] = useState(() =>
+	const [showConfirmPage] = useState(() =>
 		!!new URLSearchParams(window.location.search).get('confirmationToken')
 	);
 
@@ -43,7 +43,7 @@ export default function App() {
 				isError={confirmError}
 				confirmData={confirmData}
 				storedName={stored?.name}
-				onContinue={() => setShowConfirmPage(false)}
+				onContinue={() => window.location.reload()}
 			/>
 		);
 	}
