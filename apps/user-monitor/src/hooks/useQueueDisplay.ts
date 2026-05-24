@@ -71,13 +71,14 @@ function transform(data: QueueDisplayResponse) {
   }
 }
 
-export function useQueueDisplay(signalRConnected = false, visualMode = false) {
+export function useQueueDisplay(enabled = true, visualMode = false) {
   const lastQueue = useRef(transform(visualMode ? VISUAL_PLACEHOLDER : EMPTY_PLACEHOLDER))
 
   const query = useQuery({
     queryKey: ['queueDisplay'],
     queryFn: fetchQueueDisplay,
-    refetchInterval: signalRConnected ? false : 2500,
+    enabled,
+    refetchInterval: 2500,
     select: (data) => {
       const queue = transform(data)
       lastQueue.current = queue

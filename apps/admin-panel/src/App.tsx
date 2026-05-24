@@ -6,7 +6,6 @@ import { useLeaderboard } from './hooks/useLeaderboard'
 import { useAdminQueue } from './hooks/useAdminQueue'
 import { useActiveSession } from './hooks/useActiveSession'
 import { useStartSession, useStopSession, usePauseSession, useResumeSession, useCancelSession } from './hooks/useSessionMutations'
-import { useSignalR } from './hooks/useSignalR'
 import { useAdminSimulation } from './hooks/useAdminSimulation'
 import { QueuePanel } from './components/QueuePanel'
 import { LoginPage } from './components/LoginPage'
@@ -57,8 +56,7 @@ function AdminApp() {
   const simMode = SIM_MODE ? 'sim' : VISUAL_MODE ? 'visual' : 'off'
   const simData = useAdminSimulation(simMode)
 
-  const { connected } = useSignalR(!DEMO_MODE)
-  const { data: liveLeaderboard = [] } = useLeaderboard(connected, !DEMO_MODE)
+  const { data: liveLeaderboard = [] } = useLeaderboard(!DEMO_MODE)
   const { data: liveQueue = [] } = useAdminQueue(!DEMO_MODE)
   const { data: liveSession } = useActiveSession(!DEMO_MODE)
 

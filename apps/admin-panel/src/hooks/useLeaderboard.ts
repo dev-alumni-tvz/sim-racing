@@ -15,14 +15,14 @@ function transform(data: LeaderboardResponse) {
   }))
 }
 
-export function useLeaderboard(signalRConnected = false, enabled = true) {
+export function useLeaderboard(enabled = true) {
   const last = useRef<ReturnType<typeof transform>>([])
 
   const query = useQuery({
     queryKey: ['leaderboard'],
     queryFn: fetchLeaderboard,
     enabled,
-    refetchInterval: signalRConnected ? false : 2500,
+    refetchInterval: 2500,
     select: (data) => {
       const rows = transform(data)
       last.current = rows

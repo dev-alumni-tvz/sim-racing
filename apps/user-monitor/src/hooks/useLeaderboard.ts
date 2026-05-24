@@ -39,13 +39,14 @@ function transform(data: LeaderboardResponse) {
   }))
 }
 
-export function useLeaderboard(signalRConnected = false, visualMode = false) {
+export function useLeaderboard(enabled = true, visualMode = false) {
   const lastRows = useRef(transform(visualMode ? VISUAL_PLACEHOLDER : EMPTY_PLACEHOLDER))
 
   const query = useQuery({
     queryKey: ['leaderboard'],
     queryFn: fetchLeaderboard,
-    refetchInterval: signalRConnected ? false : 2500,
+    enabled,
+    refetchInterval: 2500,
     select: (data) => {
       const rows = transform(data)
       lastRows.current = rows
