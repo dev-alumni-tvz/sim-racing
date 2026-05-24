@@ -87,6 +87,7 @@ function AdminApp() {
   function handleFinish() {
     if (DEMO_MODE) return
     stopSessionMutation.mutate()
+    reset()
   }
 
   function handlePauseResume() {
