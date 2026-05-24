@@ -8,6 +8,7 @@ interface TimerStore {
   start: () => void
   pause: () => void
   reset: () => void
+  expire: () => void
   addTime: (delta: number) => void
 }
 
@@ -48,6 +49,11 @@ export const useTimerStore = create<TimerStore>((set, get) => {
     pause() {
       clearTimer()
       set({ isRunning: false })
+    },
+
+    expire() {
+      clearTimer()
+      set({ seconds: 0, isRunning: false })
     },
 
     reset() {

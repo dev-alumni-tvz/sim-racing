@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from './App.module.css'
 import { LeaderboardTable } from '@sim-racing/ui'
 import { useTimerStore, formatTime } from './timerStore'
@@ -49,9 +49,10 @@ export default function App() {
 }
 
 function AdminApp() {
-  const { seconds, isRunning, start, pause, reset, addTime } = useTimerStore()
+  const { seconds, isRunning, start, pause, reset, expire, addTime } = useTimerStore()
   const now = useClock()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const autoStopFired = useRef(false)
 
   const simMode = SIM_MODE ? 'sim' : VISUAL_MODE ? 'visual' : 'off'
   const simData = useAdminSimulation(simMode)
@@ -86,7 +87,7 @@ function AdminApp() {
   function handleFinish() {
     if (DEMO_MODE) return
     stopSessionMutation.mutate()
-    pause()
+    expire()
   }
 
   function handlePauseResume() {
@@ -108,10 +109,16 @@ function AdminApp() {
     reset()
   }
 
+  // Reset the guard whenever the timer is running above zero
   useEffect(() => {
-    if (DEMO_MODE || seconds !== 0 || !activeSession || stopSessionMutation.isPending) return
+    if (seconds > 0) autoStopFired.current = false
+  }, [seconds])
+
+  useEffect(() => {
+    if (DEMO_MODE || seconds !== 0 || !activeSession || stopSessionMutation.isPending || autoStopFired.current) return
+    autoStopFired.current = true
     handleFinish()
-  }, [seconds, activeSession])
+  }, [seconds, activeSession, stopSessionMutation.isPending])
 
   const monitorBase = import.meta.env.VITE_MONITOR_URL ?? 'http://localhost:5175'
   const monitorSrc = DEMO_MODE ? `${monitorBase}?visual=1` : monitorBase

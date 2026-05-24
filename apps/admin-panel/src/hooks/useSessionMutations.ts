@@ -36,9 +36,12 @@ export function useStopSession() {
       qc.invalidateQueries({ queryKey: ['activeSession'] })
       qc.invalidateQueries({ queryKey: ['adminQueue'] })
       qc.invalidateQueries({ queryKey: ['leaderboard'] })
-      editLeaderboardEntry(data.sessionId, { bestLapMs: TEST_LAP_MS }).then(() => {
-        qc.invalidateQueries({ queryKey: ['leaderboard'] })
-      }).catch(() => {})
+      // Wait for backend to create the leaderboard entry before patching the test time
+      setTimeout(() => {
+        editLeaderboardEntry(data.sessionId, { bestLapMs: TEST_LAP_MS })
+          .then(() => qc.invalidateQueries({ queryKey: ['leaderboard'] }))
+          .catch(console.error)
+      }, 800)
     },
   })
 }
