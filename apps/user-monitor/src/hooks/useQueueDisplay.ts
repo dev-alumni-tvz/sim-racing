@@ -4,7 +4,7 @@ import type { QueueDisplayResponse } from '@sim-racing/api-types'
 import { fullName, ticketToPosition } from '@sim-racing/api-types'
 import { fetchQueueDisplay } from '../services/queueDisplay'
 
-const MAX_WAITING = 25
+const MAX_WAITING = 15
 
 function nextFullHour(): string {
   const now = new Date()

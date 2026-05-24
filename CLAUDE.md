@@ -39,48 +39,92 @@ gocart-monorepo/
 ### admin-panel
 - Displayed on admin's primary monitor (landscape)
 - Protected by JWT login — single admin account
-- **Layout: 3 columns** — left (all-time leaderboard), center (timer + controls + queue), right (user-monitor iframe). No guests panel.
+- **Layout: 3 columns** — left (all-time leaderboard), center (timer + controls + queue), right (user-monitor iframe)
 
-#### Player Management (center panel)
-- Reference timer: 5-minute countdown per player, admin-controlled (not game time)
-- Timer controls: -1m, -10s, -1s, PAUSE/PLAY, +1s, +10s, +1m
-- **NEXT PLAYER** button: calls `POST /api/admin/session/start` with `attendeeId` of the next waiting attendee, then auto-starts the timer
-- **STOP** button: calls `POST /api/admin/session/stop` — ends session normally, lap time records
-- **Cancel session**: calls `DELETE /api/admin/session/{sessionId}` — aborts session, no time recorded, attendee removed from queue. `sessionId === attendeeId`.
+#### Timer widget (center panel, top)
+- Reference countdown timer per player — frontend only (Zustand), not game time
+- Starts at 05:00, counts to 00:00
+- Adjustment buttons: **-1m / -10s / -1s / +1s / +10s / +1m** — shift the countdown at any time
+- **▶ / ⏸** play-pause toggle — starts or pauses the local countdown only (no API call)
 - Clock widget shows current wall time (HH:MM:SS)
-- **NEXT QUEUE IN** countdown: pure frontend calculation — seconds until the next full hour (e.g. 12:20:37 → 39:23 until 13:00). No backend data needed.
+- **Next queue in** countdown: pure frontend — seconds until the next full hour
+
+#### Session action buttons (center panel)
+
+| Button | Color | Enabled when | API call | Effect |
+|--------|-------|-------------|----------|--------|
+| **NEXT PLAYER** | Green | No active session | `POST /api/admin/session/start` | Starts session for next waiting attendee; timer resets to 05:00 and begins |
+| **FINISH** | Blue | Active session, not paused | `POST /api/admin/session/stop` | Ends session; player goes to leaderboard; timer goes to 00:00 |
+| **PAUSE** | Red | Active session, not paused | `POST /api/admin/session/pause` | Pauses session and freezes timer; disables FINISH and DELETE |
+| **RESUME** | Green | Active session, paused | `POST /api/admin/session/resume` | Resumes session and restarts timer |
+| **DELETE** | Red | Active session, not paused | Opens confirmation dialog | On confirm: `DELETE /api/admin/session/{sessionId}` — cancels session, no time recorded, attendee removed from queue; timer resets to 05:00 |
+
+When paused: only **RESUME** is active. NEXT PLAYER, FINISH, and DELETE are all disabled.
+
+#### Session lifecycle
+
+```
+No active session
+  └─ Admin clicks NEXT PLAYER
+       → timer resets 05:00 → starts counting down
+       → [optional] PAUSE → timer freezes
+       → [optional] RESUME → timer continues
+
+  Session ends — two paths:
+  ├─ Timer hits 00:00  (auto-stop fires)
+  └─ Admin clicks FINISH
+       → POST /api/admin/session/stop
+       → timer set to 00:00
+       → player status → done; lap time recorded on leaderboard
+       → NEXT PLAYER becomes available
+
+  Admin clicks DELETE → confirms Yes
+       → DELETE /api/admin/session/{sessionId}
+       → session cancelled, no time recorded
+       → attendee removed from queue entirely
+       → timer resets to 05:00
+       → NEXT PLAYER becomes available
+```
+
+#### Currently Driving card (center panel, above queue)
+- Always visible above the queue list
+- When active: shows driver name (green) + ticket number + small **DELETE** button (same confirmation dialog as the action row DELETE)
+- When idle: shows "No active session" with a grey left border
 
 #### Queue Display (center panel — "Current Queue")
-Split into two sections based on data cross-reference:
+Split into two sections:
 
 **Played** section — attendees who have driven today:
 - Source: `GET /api/leaderboard` entries filtered by `completedAt` date = today, sorted by `completedAt` ascending (play order)
 - Row format: `[today's play order] [Full Name] [ticketNumber] [all-time rank] [gap vs all-time fastest] [lap time]`
 - Gap = `entry.bestLapMs - rank1.bestLapMs` (rank #1 from full leaderboard, all-time fastest)
+- Click row → edit modal (lap time override or delete leaderboard entry)
 
 **Next Up** section — attendees still waiting:
 - Source: `GET /api/admin/queue` entries where `status === 'waiting'`, sorted by `queuePosition`
-- Row format: `[queuePosition] [Full Name] [ticketNumber]`
-
-Current driver (status `'driving'`) is shown in the timer widget, not in the queue list.
+- Row format: `[position] [Full Name] [ticketNumber]`
+- Click row → edit modal (name/email edit, skip, delete attendee)
+- Drag row → reorder driving order (`POST /api/admin/queue/swap`)
 
 #### Edit Modal
-Opens when admin clicks any row — context-aware:
+Opens when admin clicks any queue or leaderboard row — context-aware:
 
-**Queue row click** (waiting attendee):
-- Editable fields: name, email, other personal details
-- Buttons: **Spremi** (`PUT /api/admin/attendee/{attendeeId}`), **Skip** (`POST /api/admin/queue/{attendeeId}/skip` — sends to back of queue), **Izbriši** (`DELETE /api/admin/attendee/{attendeeId}` — removes attendee entirely)
+**Next Up row click** (waiting attendee):
+- Editable fields: first name, last name, email
+- **Spremi** → `PUT /api/admin/attendee/{attendeeId}`
+- **Skip** → `POST /api/admin/queue/{attendeeId}/skip` — sends to back of queue
+- **Izbriši** → `DELETE /api/admin/attendee/{attendeeId}` — removes attendee entirely
 
-**Leaderboard row click**:
-- Editable fields: lap time override
-- Buttons: **Spremi** (`PUT /api/admin/leaderboard/{attendeeId}`), **Izbriši** (`DELETE /api/admin/leaderboard/{attendeeId}` — removes entry from leaderboard, attendee remains in system)
-- Note: `sessionId === attendeeId` — use `attendeeId` from leaderboard response as path param
+**Played row click** (completed attendee):
+- Editable field: lap time override (format `M:SS.mmm`)
+- **Spremi** → `PUT /api/admin/leaderboard/{attendeeId}`
+- **Izbriši** → `DELETE /api/admin/leaderboard/{attendeeId}` — removes leaderboard entry; attendee remains in system
 
 #### Queue Reorder (drag-and-drop)
-- Admin can drag waiting attendees up/down in the Next Up list to change drive order
-- Queue numbers (ticketNumbers) do not change — only driving order changes
-- Requires backend endpoint: `POST /api/admin/queue/swap` (see Backend Requirements)
-- Optimistic update on drag, reverts on error
+- Admin drags waiting attendees up/down in the Next Up list to change drive order
+- `ticketNumber` values do not change — only `queuePosition` changes
+- `POST /api/admin/queue/swap` with `{ attendeeIdA, attendeeIdB }`
+- Optimistic update on drag, reverts on API error
 
 ### user-monitor
 - Displayed on admin's second monitor (big vertical/portrait screen, fullscreen browser)
