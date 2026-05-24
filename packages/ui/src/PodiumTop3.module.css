@@ -48,8 +48,8 @@
 }
 
 .icon {
-    width: clamp(40px, 6.67vw, 160px);
-    height: clamp(40px, 6.67vw, 160px);
+    width: clamp(56px, 9vw, 210px);
+    height: clamp(56px, 9vw, 210px);
     object-fit: contain;
 }
 
@@ -59,6 +59,11 @@
     font-size: clamp(14px, 1.67vw, 48px);
     color: #ffffff;
     text-align: center;
+}
+
+.rank {
+    opacity: 0.6;
+    font-weight: 400;
 }
 
 /* Lap time + gap sit on the box face below the separator line */

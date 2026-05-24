@@ -20,6 +20,12 @@ const ICONS: Record<'first' | 'second' | 'third', string> = {
   third:  '/bronce.svg',
 }
 
+const RANKS: Record<'first' | 'second' | 'third', string> = {
+  first:  '1.',
+  second: '2.',
+  third:  '3.',
+}
+
 const PodiumCard: FC<{
   entry: PodiumEntry
   place: 'first' | 'second' | 'third'
@@ -28,7 +34,7 @@ const PodiumCard: FC<{
   <div className={`${styles.card} ${styles[place]}`}>
     <div className={styles.aboveBox}>
       <img src={ICONS[place]} alt={place} className={styles.icon} />
-      <span className={styles.playerName}>{entry.name}</span>
+      <span className={styles.playerName}><span className={styles.rank}>{RANKS[place]}</span> {entry.name}</span>
     </div>
     <div className={styles.inBox}>
       <span className={styles.lapTimeLabel}>Lap Time:</span>
