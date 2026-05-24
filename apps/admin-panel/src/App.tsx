@@ -87,7 +87,6 @@ function AdminApp() {
     if (DEMO_MODE) return
     stopSessionMutation.mutate()
     pause()
-    reset()
   }
 
   function handlePauseResume() {
@@ -158,11 +157,6 @@ function AdminApp() {
             <span className={styles.nextQueueLabel}>
               Next queue in: {nextFullHourCountdown(now)}
             </span>
-            {activeSession && (
-              <span className={styles.drivingLabel}>
-                {activeSession.name} ({activeSession.ticketNumber})
-              </span>
-            )}
           </div>
         </div>
 
@@ -177,7 +171,7 @@ function AdminApp() {
           <button
             className={styles.btnFinish}
             onClick={handleFinish}
-            disabled={DEMO_MODE || !activeSession || stopSessionMutation.isPending}
+            disabled={DEMO_MODE || !activeSession || isPaused || stopSessionMutation.isPending}
           >
             FINISH
           </button>
@@ -191,7 +185,7 @@ function AdminApp() {
           <button
             className={styles.btnDelete}
             onClick={() => !DEMO_MODE && activeSession && setShowDeleteConfirm(true)}
-            disabled={DEMO_MODE || !activeSession || cancelSessionMutation.isPending}
+            disabled={DEMO_MODE || !activeSession || isPaused || cancelSessionMutation.isPending}
           >
             DELETE
           </button>
@@ -213,6 +207,7 @@ function AdminApp() {
           queueEntries={queueEntries}
           activeSession={activeSession}
           playedEntries={simData?.playedEntries}
+          onDeleteSession={() => setShowDeleteConfirm(true)}
         />
       </main>
 

@@ -207,13 +207,6 @@
     margin-top: 4px;
 }
 
-.drivingLabel {
-    font-family: var(--font-ui);
-    font-weight: 700;
-    font-size: 13px;
-    color: var(--color-btn-green);
-    margin-top: 2px;
-}
 
 /* Action buttons */
 .actionRow {

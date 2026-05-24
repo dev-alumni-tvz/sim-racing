@@ -5,6 +5,87 @@
   overflow: hidden;
 }
 
+/* ---- Currently Driving card ---- */
+.currentlyDrivingCard {
+  background: var(--color-card);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+  border-left: 3px solid var(--color-btn-green);
+}
+
+.currentlyDrivingCardEmpty {
+  background: var(--color-card);
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+  border-left: 3px solid var(--color-border-dark);
+}
+
+.currentlyDrivingLabel {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-label);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.currentlyDrivingRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currentlyDrivingName {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-btn-green);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.currentlyDrivingTicket {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-text-label);
+  flex-shrink: 0;
+}
+
+.currentlyDrivingEmpty {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-text-label);
+}
+
+.btnDeleteSession {
+  padding: 4px 10px;
+  background: var(--color-btn-red);
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 11px;
+  cursor: pointer;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  transition: opacity 0.15s;
+}
+
+.btnDeleteSession:hover { opacity: 0.85; }
+
 .header {
   display: flex;
   align-items: center;

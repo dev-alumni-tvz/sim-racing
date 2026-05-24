@@ -27,6 +27,7 @@ interface Props {
   queueEntries: QueueEntry[]
   activeSession: ActiveSession
   playedEntries?: PlayedEntry[]
+  onDeleteSession?: () => void
 }
 
 type ModalState =
@@ -40,7 +41,7 @@ function parseLapTime(formatted: string): number | null {
   return Number(match[1]) * 60000 + Number(match[2]) * 1000 + Number(match[3])
 }
 
-export function QueuePanel({ queueEntries, activeSession, playedEntries: propPlayedEntries }: Props) {
+export function QueuePanel({ queueEntries, activeSession, playedEntries: propPlayedEntries, onDeleteSession }: Props) {
   const { data: hookPlayedEntries = [] } = useLeaderboardRaw()
   const playedEntries = propPlayedEntries ?? hookPlayedEntries
   const [modal, setModal] = useState<ModalState>(null)
@@ -83,6 +84,24 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
 
   return (
     <div className={styles.panel}>
+      {activeSession ? (
+        <div className={styles.currentlyDrivingCard}>
+          <span className={styles.currentlyDrivingLabel}>Currently Driving</span>
+          <div className={styles.currentlyDrivingRow}>
+            <span className={styles.currentlyDrivingName}>{activeSession.name}</span>
+            <span className={styles.currentlyDrivingTicket}>#{activeSession.ticketNumber}</span>
+            {onDeleteSession && (
+              <button className={styles.btnDeleteSession} onClick={onDeleteSession}>DELETE</button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className={styles.currentlyDrivingCardEmpty}>
+          <span className={styles.currentlyDrivingLabel}>Currently Driving</span>
+          <span className={styles.currentlyDrivingEmpty}>No active session</span>
+        </div>
+      )}
+
       <div className={styles.header}>
         <span className={styles.title}>Current Queue</span>
         {activeSession && <span className={styles.activeDot} />}
