@@ -33,10 +33,11 @@ export default function App() {
 	const podiumThird  = top3[2] ? { name: top3[2].name, lapTime: top3[2].lapTime, gap: top3[2].gap ?? undefined } : EMPTY;
 
 	const MIN_ROWS = 8;
+	const nextPosition = Math.max(4, top3.length + rest.length + 1);
 	const leaderboardRows = rest.length >= MIN_ROWS ? rest : [
 		...rest,
 		...Array.from({ length: MIN_ROWS - rest.length }, (_, i) => ({
-			position: top3.length + rest.length + i + 1,
+			position: nextPosition + i,
 			name: '—',
 			lapTime: '--:--.---',
 			gap: null as string | null,
