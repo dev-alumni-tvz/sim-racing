@@ -32,8 +32,8 @@ export default function App() {
 
 	useEffect(() => {
 		if (!confirmData) return;
-		const name = [confirmData.firstName, confirmData.lastName].filter(Boolean).join(' ') || stored?.name;
-		confirmTicket(confirmData.queuePosition, Math.ceil(confirmData.estimatedWaitSeconds / 60), name);
+		const name = `${confirmData.firstName} ${confirmData.lastName}`.trim();
+		confirmTicket(parseInt(confirmData.ticketNumber, 10), Math.ceil(confirmData.estimatedWaitSeconds / 60), name);
 	}, [confirmData]);
 
 	if (showConfirmPage && hasToken) {

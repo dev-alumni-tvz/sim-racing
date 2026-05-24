@@ -13,8 +13,8 @@ interface Props {
 
 export const ConfirmationPage: FC<Props> = ({ isLoading, isError, confirmData, storedName, onContinue }) => {
   const name = confirmData
-    ? [confirmData.firstName, confirmData.lastName].filter(Boolean).join(' ') || storedName || ''
-    : storedName || ''
+    ? `${confirmData.firstName} ${confirmData.lastName}`.trim()
+    : storedName ?? ''
 
   return (
     <div className={styles.page}>
@@ -52,7 +52,7 @@ export const ConfirmationPage: FC<Props> = ({ isLoading, isError, confirmData, s
             <p className={styles.successSubtitle}>Tvoje mjesto u redu je osigurano.</p>
             <div className={styles.ticketWrapper}>
               <TicketCard
-                queueNumber={confirmData.queuePosition}
+                queueNumber={parseInt(confirmData.ticketNumber, 10)}
                 name={name}
                 estimatedWaitMinutes={Math.ceil(confirmData.estimatedWaitSeconds / 60)}
               />
