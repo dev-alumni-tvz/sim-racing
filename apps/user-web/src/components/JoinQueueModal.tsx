@@ -28,7 +28,8 @@ export const JoinQueueModal: FC<Props> = ({ onClose, onSuccess }) => {
     return () => { document.body.style.overflow = '' }
   }, [])
 
-  const emailValid = email.toLowerCase().endsWith('@tvz.hr')
+  // const emailValid = email.toLowerCase().endsWith('@tvz.hr')
+  const emailValid = email.trim().length > 0
   const canSubmit =
     firstName.trim().length > 0 && lastName.trim().length > 0 && emailValid
 
@@ -90,16 +91,16 @@ export const JoinQueueModal: FC<Props> = ({ onClose, onSuccess }) => {
           <div className={styles.field}>
             <label className={styles.label}>Email</label>
             <input
-              className={`${styles.input} ${email && !emailValid ? styles.inputError : ''}`}
+              className={styles.input}
               type="email"
-              placeholder="user@tvz.hr"
+              placeholder="email@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={registration.isPending}
             />
-            {email && !emailValid && (
+            {/* {email && !emailValid && (
               <span className={styles.fieldError}>Email mora završavati na @tvz.hr</span>
-            )}
+            )} */}
           </div>
         </div>
 
