@@ -39,8 +39,8 @@ export function useStopSession() {
       qc.invalidateQueries({ queryKey: ['leaderboard'] })
       // Wait for backend to create the leaderboard entry before patching the test time
       setTimeout(() => {
-        console.log('[session/stop] patching test lap time for sessionId:', data.sessionId)
-        editLeaderboardEntry(data.sessionId, { bestLapMs: TEST_LAP_MS })
+        console.log('[session/stop] patching test lap time for attendeeId:', data.attendeeId)
+        editLeaderboardEntry(data.attendeeId, { bestLapMs: TEST_LAP_MS })
           .then(() => {
             console.log('[session/stop] leaderboard patched — invalidating')
             qc.invalidateQueries({ queryKey: ['leaderboard'] })

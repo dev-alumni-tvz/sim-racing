@@ -303,7 +303,7 @@ Figma MCP is configured in `~/.claude/.mcp.json`. Claude Code can read Figma des
 { "bestLapMs": 0 }
 ```
 
-Note: `sessionId === attendeeId` (one session per attendee, enforced at DB level).
+Note: `sessionId` and `attendeeId` are separate UUIDs. The leaderboard PUT/DELETE endpoints use `attendeeId` as the path param, not `sessionId`.
 
 ---
 
@@ -430,7 +430,7 @@ Response: 200 OK (no body) | 400 if either attendeeId not found or not in waitin
 ## Domain Glossary
 
 - **Attendee** — a person who has registered via the user-web app. Has a `ticketNumber` and `attendeeId`.
-- **Session** — a single driving run for an attendee. `sessionId === attendeeId` (one attempt per day enforced at DB level).
+- **Session** — a single driving run for an attendee. Has its own `sessionId` UUID distinct from `attendeeId`. One session per attendee enforced at DB level. Leaderboard admin endpoints use `attendeeId` as the path param.
 - **ticketNumber** — the visible queue number shown to the attendee (e.g. "007"). Stable string, assigned at registration, ranges 000–999, ~80 contestants expected. Does not change even if drive order is reordered. Always shown to the user as their identity token. Frontend parses it to int for `TicketCard` display.
 - **queuePosition** — the driving order position within the active queue (max 15 slots). Changes when admin reorders. Not shown to users — internal ordering only.
 - **Played** — an attendee who has completed a session and has a recorded lap time on the leaderboard. Determined by presence in `/api/leaderboard` with `completedAt` date = today.
