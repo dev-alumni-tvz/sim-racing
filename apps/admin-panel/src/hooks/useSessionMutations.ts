@@ -33,15 +33,25 @@ export function useStopSession() {
   return useMutation({
     mutationFn: stopSession,
     onSuccess: (data) => {
+      console.log('[session/stop] response:', data)
       qc.invalidateQueries({ queryKey: ['activeSession'] })
       qc.invalidateQueries({ queryKey: ['adminQueue'] })
       qc.invalidateQueries({ queryKey: ['leaderboard'] })
       // Wait for backend to create the leaderboard entry before patching the test time
       setTimeout(() => {
+        console.log('[session/stop] patching test lap time for sessionId:', data.sessionId)
         editLeaderboardEntry(data.sessionId, { bestLapMs: TEST_LAP_MS })
-          .then(() => qc.invalidateQueries({ queryKey: ['leaderboard'] }))
-          .catch(console.error)
+          .then(() => {
+            console.log('[session/stop] leaderboard patched — invalidating')
+            qc.invalidateQueries({ queryKey: ['leaderboard'] })
+          })
+          .catch((err) => console.error('[session/stop] leaderboard patch failed:', err))
       }, 800)
+    },
+    onError: () => {
+      // 400 means no active session — stale frontend state; sync all queries
+      qc.invalidateQueries({ queryKey: ['activeSession'] })
+      qc.invalidateQueries({ queryKey: ['adminQueue'] })
     },
   })
 }

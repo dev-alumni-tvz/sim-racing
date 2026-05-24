@@ -48,14 +48,23 @@ export interface StartSessionResponse {
   startedAt: string
 }
 
-// POST /api/admin/session/stop
+// POST /api/admin/session/stop (also used by pause/resume/cancel/get)
 export interface StopSessionResponse {
   sessionId: string
   attendeeId: string
+  attendeeFirstName: string
+  attendeeLastName: string
+  ticketNumber: string
+  status: string
+  startedAt: string
+  endedAt: string | null
   durationSeconds: number
-  /** null immediately after stop — arrives via LeaderboardHub.LeaderboardUpdated */
+  /** null until bridge pushes lap data */
   bestLapMs: number | null
+  bestLapFormatted: string | null
+  lapsCompleted: number
   bridgeDataReceived: boolean
+  isPaused: boolean
 }
 
 // POST /api/admin/queue/{attendeeId}/skip
