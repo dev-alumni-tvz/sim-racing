@@ -5,7 +5,7 @@ import './global.css'
 import App from './App'
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { refetchInterval: 2500 } },
+  defaultOptions: { queries: { refetchInterval: 2500, refetchIntervalInBackground: true } },
 })
 
 createRoot(document.getElementById('root')!).render(
