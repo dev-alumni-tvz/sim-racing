@@ -91,8 +91,7 @@ export interface EditLeaderboardRequest {
   bestLapMs: number
 }
 
-// POST /api/admin/queue/swap
-export interface SwapQueueRequest {
-  attendeeIdA: string
-  attendeeIdB: string
+// POST /api/admin/queue/reorder
+export interface ReorderQueueRequest {
+  attendeeIds: string[]
 }

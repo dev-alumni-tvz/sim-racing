@@ -225,6 +225,26 @@
   flex-shrink: 0;
 }
 
+.ticketInQueue {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-cta-yellow);
+  flex-shrink: 0;
+}
+
+.insertionLine {
+  height: 2px;
+  background: var(--color-btn-primary);
+  border-radius: 1px;
+  margin: 1px 6px;
+  pointer-events: none;
+}
+
+.draggingRow {
+  opacity: 0.4;
+}
+
 .rank {
   font-family: var(--font-ui);
   font-size: 11px;

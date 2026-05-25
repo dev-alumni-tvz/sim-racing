@@ -9,7 +9,7 @@ import type {
   CancelSessionResponse,
   EditAttendeeRequest,
   EditLeaderboardRequest,
-  SwapQueueRequest,
+  ReorderQueueRequest,
 } from '@sim-racing/api-types'
 import { apiFetch } from './api'
 
@@ -70,8 +70,8 @@ export function deleteLeaderboardEntry(attendeeId: string): Promise<void> {
   return apiFetch<void>(`/api/admin/leaderboard/${attendeeId}`, { method: 'DELETE' })
 }
 
-export function swapQueuePositions(body: SwapQueueRequest): Promise<void> {
-  return apiFetch<void>('/api/admin/queue/swap', {
+export function reorderQueuePositions(body: ReorderQueueRequest): Promise<void> {
+  return apiFetch<void>('/api/admin/queue/reorder', {
     method: 'POST',
     body: JSON.stringify(body),
   })

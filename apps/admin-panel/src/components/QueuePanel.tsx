@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useLeaderboardRaw, type PlayedEntry } from '../hooks/useLeaderboardRaw'
 import {
   useEditAttendee,
@@ -6,7 +6,7 @@ import {
   useSkipAttendee,
   useEditLeaderboardEntry,
   useDeleteLeaderboardEntry,
-  useSwapQueue,
+  useReorderQueue,
 } from '../hooks/useSessionMutations'
 import styles from './QueuePanel.module.css'
 
@@ -46,14 +46,15 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
   const playedEntries = propPlayedEntries ?? hookPlayedEntries
   const [modal, setModal] = useState<ModalState>(null)
   const [localOrder, setLocalOrder] = useState<QueueEntry[] | null>(null)
-  const dragIdx = useRef<number | null>(null)
+  const [draggingIdx, setDraggingIdx] = useState<number | null>(null)
+  const [dropLineIdx, setDropLineIdx] = useState<number | null>(null)
 
   const editAttendee = useEditAttendee()
   const deleteAttendee = useDeleteAttendee()
   const skipAttendee = useSkipAttendee()
   const editLeaderboard = useEditLeaderboardEntry()
   const deleteLeaderboard = useDeleteLeaderboardEntry()
-  const swapQueue = useSwapQueue()
+  const reorderQueue = useReorderQueue()
 
   const waitingFromServer = queueEntries
     .filter((e) => e.status === 'waiting')
@@ -71,23 +72,53 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
   const playedRows = [...withLb, ...withoutLb]
 
   function handleDragStart(idx: number) {
-    dragIdx.current = idx
+    setDraggingIdx(idx)
+    setDropLineIdx(null)
   }
 
-  function handleDrop(dropIdx: number) {
-    const fromIdx = dragIdx.current
-    dragIdx.current = null
-    if (fromIdx === null || fromIdx === dropIdx) return
+  function handleDragOver(ev: React.DragEvent, idx: number) {
+    ev.preventDefault()
+    const rect = ev.currentTarget.getBoundingClientRect()
+    setDropLineIdx(ev.clientY < rect.top + rect.height / 2 ? idx : idx + 1)
+  }
+
+  function handleDrop(ev: React.DragEvent) {
+    ev.preventDefault()
+    if (draggingIdx === null || dropLineIdx === null) {
+      setDraggingIdx(null)
+      setDropLineIdx(null)
+      return
+    }
+
+    const fromIdx = draggingIdx
+    const lineIdx = dropLineIdx
+    setDraggingIdx(null)
+    setDropLineIdx(null)
+
+    // no-op: dropping into the same position or adjacent gap
+    if (lineIdx === fromIdx || lineIdx === fromIdx + 1) return
 
     const reordered = [...waitingEntries]
     const [moved] = reordered.splice(fromIdx, 1)
-    reordered.splice(dropIdx, 0, moved)
+    const insertAt = lineIdx > fromIdx ? lineIdx - 1 : lineIdx
+    reordered.splice(insertAt, 0, moved)
     setLocalOrder(reordered)
 
-    swapQueue.mutate(
-      { attendeeIdA: waitingEntries[fromIdx].attendeeId, attendeeIdB: waitingEntries[dropIdx].attendeeId },
+    reorderQueue.mutate(
+      { attendeeIds: reordered.map((e) => e.attendeeId) },
       { onSuccess: () => setLocalOrder(null), onError: () => setLocalOrder(null) }
     )
+  }
+
+  function handleDragEnd() {
+    setDraggingIdx(null)
+    setDropLineIdx(null)
+  }
+
+  function handleContainerDragLeave(ev: React.DragEvent) {
+    if (!ev.currentTarget.contains(ev.relatedTarget as Node)) {
+      setDropLineIdx(null)
+    }
   }
 
   return (
@@ -131,7 +162,7 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
               >
                 <span className={styles.playOrder}>{idx + 1}.</span>
                 <span className={styles.name}>{qe.name}</span>
-                <span className={styles.ticket}>#{qe.ticketNumber}</span>
+                <span className={styles.ticketInQueue}>#{qe.ticketNumber}</span>
                 <span className={styles.rank}>{lb ? `P${lb.rank}` : '—'}</span>
                 <span className={styles.gap}>{lb ? (lb.gap ?? '—') : '—'}</span>
                 <span className={styles.lapTime}>{lb ? lb.lapTime : '—'}</span>
@@ -142,28 +173,43 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
           )}
         </div>
 
-        <div className={styles.section}>
+        <div
+          className={styles.section}
+          onDrop={handleDrop}
+          onDragLeave={handleContainerDragLeave}
+        >
           <p className={styles.sectionLabel}>Next Up</p>
-          {waitingEntries.length > 0 ? waitingEntries.map((e, idx) => (
-            <div
-              key={e.attendeeId}
-              className={styles.draggableRow}
-              draggable
-              onDragStart={() => handleDragStart(idx)}
-              onDragOver={(ev) => ev.preventDefault()}
-              onDrop={() => handleDrop(idx)}
-            >
-              <span className={styles.dragHandle}>⠿</span>
-              <button
-                className={styles.rowInner}
-                onClick={() => setModal({ type: 'queue', entry: e })}
-              >
-                <span className={styles.playOrder}>{idx + 1}.</span>
-                <span className={styles.name}>{e.name}</span>
-                <span className={styles.ticket}>#{e.ticketNumber}</span>
-              </button>
-            </div>
-          )) : (
+          {waitingEntries.length > 0 ? (
+            <>
+              {waitingEntries.map((e, idx) => (
+                <div key={e.attendeeId}>
+                  {dropLineIdx === idx && draggingIdx !== null && (
+                    <div className={styles.insertionLine} />
+                  )}
+                  <div
+                    className={`${styles.draggableRow} ${draggingIdx === idx ? styles.draggingRow : ''}`}
+                    draggable
+                    onDragStart={() => handleDragStart(idx)}
+                    onDragOver={(ev) => handleDragOver(ev, idx)}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <span className={styles.dragHandle}>⠿</span>
+                    <button
+                      className={styles.rowInner}
+                      onClick={() => setModal({ type: 'queue', entry: e })}
+                    >
+                      <span className={styles.playOrder}>{idx + 1}.</span>
+                      <span className={styles.name}>{e.name}</span>
+                      <span className={styles.ticketInQueue}>#{e.ticketNumber}</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {dropLineIdx === waitingEntries.length && draggingIdx !== null && (
+                <div className={styles.insertionLine} />
+              )}
+            </>
+          ) : (
             <div className={styles.emptyRow}>&nbsp;</div>
           )}
         </div>

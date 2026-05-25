@@ -47,19 +47,31 @@ gocart-monorepo/
 - Adjustment buttons: **-1m / -10s / -1s / +1s / +10s / +1m** — shift the countdown at any time
 - **▶ / ⏸** play-pause toggle — starts or pauses the local countdown only (no API call)
 - Clock widget shows current wall time (HH:MM:SS)
-- **Next queue in** countdown: pure frontend — seconds until the next full hour
+- **Queue window countdown**: polls `GET /api/admin/queue/window` every 2.5s
+  - Window **active** → label "Queue ends in: MM:SS", value from `timeRemainingSeconds`
+  - Window **inactive** → label "Next queue in: —"
 
-#### Session action buttons (center panel)
+#### Queue window control (center panel)
+
+The action area is state-driven by the queue window status (`GET /api/admin/queue/window`):
+
+**Window inactive** — shows a single button:
+
+| Button | Color | API call | Effect |
+|--------|-------|----------|--------|
+| **START QUEUE** | Green | `POST /api/admin/queue/window/start` | Opens a 60-min queue window; action row replaces this button |
+
+**Window active** — shows the session action row:
 
 | Button | Color | Enabled when | API call | Effect |
 |--------|-------|-------------|----------|--------|
 | **NEXT PLAYER** | Green | No active session | `POST /api/admin/session/start` | Starts session for next waiting attendee; timer resets to 05:00 and begins |
 | **FINISH** | Blue | Active session, not paused | `POST /api/admin/session/stop` | Ends session; player goes to leaderboard; timer goes to 00:00 |
-| **PAUSE** | Red | Active session, not paused | `POST /api/admin/session/pause` | Pauses session and freezes timer; disables FINISH and DELETE |
+| **PAUSE** | Red | Active session, not paused | `POST /api/admin/session/pause` | Pauses session and freezes timer; disables FINISH and STOP QUEUE |
 | **RESUME** | Green | Active session, paused | `POST /api/admin/session/resume` | Resumes session and restarts timer |
-| **DELETE** | Red | Active session, not paused | Opens confirmation dialog | On confirm: `DELETE /api/admin/session/{sessionId}` — cancels session, no time recorded, attendee removed from queue; timer resets to 05:00 |
+| **STOP QUEUE** | Red | No active session | Opens confirmation dialog | On confirm: `POST /api/admin/queue/window/stop` — closes window; START QUEUE button replaces action row |
 
-When paused: only **RESUME** is active. NEXT PLAYER, FINISH, and DELETE are all disabled.
+When paused: only **RESUME** is active. NEXT PLAYER, FINISH, and STOP QUEUE are all disabled.
 
 #### Session lifecycle
 
@@ -78,17 +90,22 @@ No active session
        → player status → done; lap time recorded on leaderboard
        → NEXT PLAYER becomes available
 
-  Admin clicks DELETE → confirms Yes
+  Admin clicks DELETE (small button in Currently Driving card) → confirms Yes
        → DELETE /api/admin/session/{sessionId}
        → session cancelled, no time recorded
        → attendee removed from queue entirely
        → timer resets to 05:00
        → NEXT PLAYER becomes available
+
+  Admin clicks STOP QUEUE → confirms Yes
+       → POST /api/admin/queue/window/stop
+       → window closes; action row replaced by START QUEUE button
+       → (only available when no active session)
 ```
 
 #### Currently Driving card (center panel, above queue)
 - Always visible above the queue list
-- When active: shows driver name (green) + ticket number + small **DELETE** button (same confirmation dialog as the action row DELETE)
+- When active: shows driver name (green) + ticket number + small **DELETE** button (triggers same confirmation dialog)
 - When idle: shows "No active session" with a grey left border
 
 #### Queue Display (center panel — "Current Queue")
@@ -104,7 +121,7 @@ Split into two sections:
 - Source: `GET /api/admin/queue` entries where `status === 'waiting'`, sorted by `queuePosition`
 - Row format: `[position] [Full Name] [ticketNumber]`
 - Click row → edit modal (name/email edit, skip, delete attendee)
-- Drag row → reorder driving order (`POST /api/admin/queue/swap`)
+- Drag row → reorder driving order (`POST /api/admin/queue/reorder`)
 
 #### Edit Modal
 Opens when admin clicks any queue or leaderboard row — context-aware:
@@ -123,7 +140,7 @@ Opens when admin clicks any queue or leaderboard row — context-aware:
 #### Queue Reorder (drag-and-drop)
 - Admin drags waiting attendees up/down in the Next Up list to change drive order
 - `ticketNumber` values do not change — only `queuePosition` changes
-- `POST /api/admin/queue/swap` with `{ attendeeIdA, attendeeIdB }`
+- `POST /api/admin/queue/reorder` with `{ attendeeIds: string[] }`
 - Optimistic update on drag, reverts on API error
 
 ### user-monitor
@@ -136,7 +153,9 @@ Opens when admin clicks any queue or leaderboard row — context-aware:
   - Next Up and Previous player cards
   - Full queue display with queue numbers
   - "New slots open at" and "Free slots available" info cards
-  - Queue ends countdown timer
+  - **Queue ends countdown**: polls `GET /api/queue/window` every 2.5s
+    - Window **active** → shows `timeRemainingSeconds` formatted as "Xm Ys" on PodiumTop3 card
+    - Window **inactive** → shows "—"
 
 ## Data Flow
 
@@ -212,6 +231,26 @@ Figma MCP is configured in `~/.claude/.mcp.json`. Claude Code can read Figma des
 
 // POST /auth/login — response 200
 { "token": "string", "expiresAt": "ISO8601" }
+```
+
+---
+
+### Admin — Queue Window
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| GET | `/api/admin/queue/window` | Bearer | Current window status |
+| POST | `/api/admin/queue/window/start` | Bearer | Open a new 60-min window → 200 QueueWindowStatus |
+| POST | `/api/admin/queue/window/stop` | Bearer | Close the window → 200 QueueWindowStatus |
+
+```json
+// QueueWindowStatus (used by all three endpoints)
+{
+  "isActive": true,
+  "windowStartedAt": "ISO8601",
+  "windowEndsAt": "ISO8601",
+  "timeRemainingSeconds": 3542
+}
 ```
 
 ---
@@ -333,6 +372,16 @@ Note: `sessionId` and `attendeeId` are separate UUIDs. The leaderboard PUT/DELET
 
 ---
 
+### Public — Queue Window
+
+| Method | Endpoint | Auth | Purpose |
+|--------|----------|------|---------|
+| GET | `/api/queue/window` | none | Current window status for user-monitor countdown |
+
+Response: `QueueWindowStatus` (same schema as admin queue window — see above)
+
+---
+
 ### Public — Queue Display
 
 | Method | Endpoint | Auth | Purpose |
@@ -412,20 +461,21 @@ Note: `currentDriver`, `nextDriver`, `previousDriver` are `null` when no one is 
 
 ## Backend Requirements (for backend dev)
 
-### New endpoint needed: Queue Swap
+### New endpoint needed: Queue Reorder
 
 ```
-POST /api/admin/queue/swap
+POST /api/admin/queue/reorder
 Auth: Authorization: Bearer <token>
-Body: { "attendeeIdA": "string", "attendeeIdB": "string" }
-Response: 200 OK (no body) | 400 if either attendeeId not found or not in waiting status
+Body: { "attendeeIds": ["uuid", "uuid", ...] }
+Response: 200 OK (no body) | 400 if any attendeeId not found or not in waiting status
 ```
 
-**Purpose:** Swaps the driving order (queuePosition) of two waiting attendees. Used by admin drag-and-drop in the queue panel. Rules:
+**Purpose:** Reorders the drive queue (insert semantics). Frontend sends the complete new order as an array of attendee UUIDs; backend reassigns `queuePosition` values to match. Used by admin drag-and-drop in the queue panel. Rules:
 - Only works for attendees with `status === 'waiting'`
-- Cannot swap a currently driving or completed attendee
-- `ticketNumber` values do not change — only `queuePosition` swaps
-- Both attendeeIds must belong to the same active queue
+- Cannot include a currently driving or completed attendee
+- `ticketNumber` values never change — only `queuePosition` values are updated
+- All attendeeIds must belong to the same active queue
+- Array must contain exactly the same set of waiting attendee IDs (no additions or removals)
 
 ## Domain Glossary
 
@@ -437,4 +487,5 @@ Response: 200 OK (no body) | 400 if either attendeeId not found or not in waitin
 - **Waiting** — an attendee in the queue who has not yet driven. Status `'waiting'` on the queue endpoint.
 - **Current Driver** — attendee with status `'driving'`. Only one at a time, enforced at DB level.
 - **Gap** — difference in milliseconds between an attendee's `bestLapMs` and the all-time fastest `bestLapMs` (rank #1). Computed on the frontend.
-- **NEXT QUEUE IN** — frontend-only countdown to the next full hour from current wall time. No backend data.
+- **Queue Window** — a 60-minute period during which the queue is open and sessions can run. Admin starts it manually via `POST /api/admin/queue/window/start`; it auto-cycles every 60 min until stopped. Status tracked by `QueueWindowStatus` (`isActive`, `windowEndsAt`, `timeRemainingSeconds`). Polled by admin panel (`GET /api/admin/queue/window`) and user-monitor (`GET /api/queue/window`).
+- **Queue ends in / Next queue in** — the countdown label on both admin panel and user-monitor. Shows `timeRemainingSeconds` from the window API. Label reads "Queue ends in: MM:SS" when window active; "Next queue in: —" when inactive.

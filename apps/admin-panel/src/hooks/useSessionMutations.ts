@@ -10,9 +10,9 @@ import {
   deleteAttendee,
   editLeaderboardEntry,
   deleteLeaderboardEntry,
-  swapQueuePositions,
+  reorderQueuePositions,
 } from '../services/session'
-import type { EditAttendeeRequest, EditLeaderboardRequest, SwapQueueRequest } from '@sim-racing/api-types'
+import type { EditAttendeeRequest, EditLeaderboardRequest, ReorderQueueRequest } from '@sim-racing/api-types'
 
 export function useStartSession() {
   const qc = useQueryClient()
@@ -120,10 +120,10 @@ export function useDeleteLeaderboardEntry() {
   })
 }
 
-export function useSwapQueue() {
+export function useReorderQueue() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (body: SwapQueueRequest) => swapQueuePositions(body),
+    mutationFn: (body: ReorderQueueRequest) => reorderQueuePositions(body),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['adminQueue'] }),
   })
 }
