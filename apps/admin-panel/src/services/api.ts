@@ -19,7 +19,7 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   }
   if (!res.ok) throw new Error(`${res.status} ${path}`)
   const text = await res.text()
-  return (text ? JSON.parse(text) : undefined) as T
+  return (text ? JSON.parse(text) : null) as T
 }
 
 export const API_BASE_URL = BASE_URL

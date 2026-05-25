@@ -2,6 +2,7 @@ import styles from './App.module.css';
 import { LeaderboardTable, PlayerCard, PodiumTop3, QueueDisplay } from '@sim-racing/ui';
 import { useLeaderboard } from './hooks/useLeaderboard';
 import { useQueueDisplay } from './hooks/useQueueDisplay';
+import { useQueueWindow } from './hooks/useQueueWindow';
 import { useSimulation } from './hooks/useSimulation';
 
 const SIM_MODE    = new URLSearchParams(window.location.search).get('sim')    === '1';
@@ -16,6 +17,7 @@ function formatSeconds(s: number): string {
 export default function App() {
 	const { data: liveRows } = useLeaderboard(!SIM_MODE, VISUAL_MODE);
 	const { data: liveQueue } = useQueueDisplay(!SIM_MODE, VISUAL_MODE);
+	const { data: queueWindow } = useQueueWindow(!SIM_MODE && !VISUAL_MODE);
 	const { rows: simRows, queue: simQueue } = useSimulation(SIM_MODE);
 
 	const rows = SIM_MODE ? simRows : liveRows;
@@ -62,7 +64,7 @@ export default function App() {
 						first={podiumFirst}
 						second={podiumSecond}
 						third={podiumThird}
-						queueEndsText={formatSeconds(queue.estimatedWaitSeconds)}
+						queueEndsText={queueWindow?.isActive ? formatSeconds(queueWindow.timeRemainingSeconds) : '—'}
 					/>
 					<div className={styles.podiumDivider} />
 				</section>

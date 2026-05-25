@@ -1,3 +1,11 @@
+// GET /api/queue/window  (public) and GET /api/admin/queue/window (admin)
+export interface QueueWindowStatus {
+  isActive: boolean
+  windowStartedAt: string | null
+  windowEndsAt: string | null
+  timeRemainingSeconds: number
+}
+
 // GET /api/queue/display
 export interface QueueDriverInfo {
   ticketNumber: string

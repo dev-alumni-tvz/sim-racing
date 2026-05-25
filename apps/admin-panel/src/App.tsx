@@ -6,6 +6,7 @@ import { useLeaderboard } from './hooks/useLeaderboard'
 import { useAdminQueue } from './hooks/useAdminQueue'
 import { useActiveSession } from './hooks/useActiveSession'
 import { useStartSession, useStopSession, usePauseSession, useResumeSession, useCancelSession } from './hooks/useSessionMutations'
+import { useQueueWindow, useStartQueueWindow, useStopQueueWindow } from './hooks/useQueueWindow'
 import { useAdminSimulation } from './hooks/useAdminSimulation'
 import { QueuePanel } from './components/QueuePanel'
 import { LoginPage } from './components/LoginPage'
@@ -28,13 +29,9 @@ function clockStr(d: Date) {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
 }
 
-function nextFullHourCountdown(now: Date): string {
-  const next = new Date(now)
-  next.setHours(next.getHours() + 1, 0, 0, 0)
-  const diffMs = next.getTime() - now.getTime()
-  const totalSec = Math.floor(diffMs / 1000)
-  const m = Math.floor(totalSec / 60)
-  const s = totalSec % 60
+function formatWindowCountdown(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
@@ -52,6 +49,7 @@ function AdminApp() {
   const { seconds, start, pause, reset, addTime } = useTimerStore()
   const now = useClock()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showStopQueueConfirm, setShowStopQueueConfirm] = useState(false)
   const autoStopFired = useRef(false)
 
   const simMode = SIM_MODE ? 'sim' : VISUAL_MODE ? 'visual' : 'off'
@@ -60,18 +58,25 @@ function AdminApp() {
   const { data: liveLeaderboard = [] } = useLeaderboard(!DEMO_MODE)
   const { data: liveQueue = [] } = useAdminQueue(!DEMO_MODE)
   const { data: liveSession } = useActiveSession(!DEMO_MODE)
+  const { data: queueWindow, isPending: windowPending } = useQueueWindow(!DEMO_MODE)
 
   const leaderboardRows = simData?.leaderboardRows ?? liveLeaderboard
   const queueEntries = simData?.queueEntries ?? liveQueue
   const activeSession = simData?.activeSession ?? liveSession ?? null
   const displaySeconds = simData?.timerSeconds ?? seconds
   const isPaused = activeSession?.isPaused ?? false
+  // windowLoaded: true immediately if cached (initialData hit) or in DEMO_MODE
+  const windowLoaded = DEMO_MODE || !windowPending
+  // In DEMO_MODE always show action row (visual preview); otherwise use server state
+  const windowActive = DEMO_MODE || (queueWindow?.isActive ?? false)
 
   const startSessionMutation = useStartSession()
   const stopSessionMutation = useStopSession()
   const pauseSessionMutation = usePauseSession()
   const resumeSessionMutation = useResumeSession()
   const cancelSessionMutation = useCancelSession()
+  const startQueueMutation = useStartQueueWindow()
+  const stopQueueMutation = useStopQueueWindow()
 
   function handleNextPlayer() {
     if (DEMO_MODE) return
@@ -108,6 +113,12 @@ function AdminApp() {
     reset()
   }
 
+  function handleStopQueueConfirm() {
+    if (DEMO_MODE) return
+    stopQueueMutation.mutate()
+    setShowStopQueueConfirm(false)
+  }
+
   // Reset the guard whenever the timer is running above zero
   useEffect(() => {
     if (seconds > 0) autoStopFired.current = false
@@ -121,6 +132,11 @@ function AdminApp() {
 
   const monitorBase = import.meta.env.VITE_MONITOR_URL ?? 'http://localhost:5175'
   const monitorSrc = DEMO_MODE ? `${monitorBase}?visual=1` : monitorBase
+
+  const windowCountdownLabel = windowActive ? 'Queue ends in:' : 'Next queue in:'
+  const windowCountdownValue = windowActive && queueWindow
+    ? formatWindowCountdown(queueWindow.timeRemainingSeconds)
+    : '—'
 
   return (
     <div className={styles.layout}>
@@ -165,41 +181,53 @@ function AdminApp() {
             <span className={styles.currentTimeLabel}>Current Time</span>
             <span className={styles.currentTimeClock}>{clockStr(now)}</span>
             <span className={styles.nextQueueLabel}>
-              Next queue in: {nextFullHourCountdown(now)}
+              {windowCountdownLabel} {windowCountdownValue}
             </span>
           </div>
         </div>
 
-        <div className={styles.actionRow}>
-          <button
-            className={styles.btnNextPlayer}
-            onClick={handleNextPlayer}
-            disabled={DEMO_MODE || !!activeSession || startSessionMutation.isPending}
-          >
-            NEXT PLAYER
-          </button>
-          <button
-            className={styles.btnFinish}
-            onClick={handleFinish}
-            disabled={DEMO_MODE || !activeSession || isPaused || stopSessionMutation.isPending}
-          >
-            FINISH
-          </button>
-          <button
-            className={isPaused ? styles.btnResume : styles.btnPauseToggle}
-            onClick={handlePauseResume}
-            disabled={DEMO_MODE || !activeSession || pauseSessionMutation.isPending || resumeSessionMutation.isPending}
-          >
-            {isPaused ? 'RESUME' : 'PAUSE'}
-          </button>
-          <button
-            className={styles.btnDelete}
-            onClick={() => !DEMO_MODE && activeSession && setShowDeleteConfirm(true)}
-            disabled={DEMO_MODE || !activeSession || isPaused || cancelSessionMutation.isPending}
-          >
-            DELETE
-          </button>
-        </div>
+        {!windowLoaded ? null : !windowActive ? (
+          <div className={styles.actionRow}>
+            <button
+              className={styles.btnNextPlayer}
+              onClick={() => !DEMO_MODE && startQueueMutation.mutate()}
+              disabled={DEMO_MODE || startQueueMutation.isPending}
+            >
+              START QUEUE
+            </button>
+          </div>
+        ) : (
+          <div className={styles.actionRow}>
+            <button
+              className={styles.btnNextPlayer}
+              onClick={handleNextPlayer}
+              disabled={DEMO_MODE || !!activeSession || startSessionMutation.isPending}
+            >
+              NEXT PLAYER
+            </button>
+            <button
+              className={styles.btnFinish}
+              onClick={handleFinish}
+              disabled={DEMO_MODE || !activeSession || isPaused || stopSessionMutation.isPending}
+            >
+              FINISH
+            </button>
+            <button
+              className={isPaused ? styles.btnResume : styles.btnPauseToggle}
+              onClick={handlePauseResume}
+              disabled={DEMO_MODE || !activeSession || pauseSessionMutation.isPending || resumeSessionMutation.isPending}
+            >
+              {isPaused ? 'RESUME' : 'PAUSE'}
+            </button>
+            <button
+              className={styles.btnDelete}
+              onClick={() => !DEMO_MODE && !activeSession && setShowStopQueueConfirm(true)}
+              disabled={DEMO_MODE || !!activeSession || isPaused || stopQueueMutation.isPending}
+            >
+              STOP QUEUE
+            </button>
+          </div>
+        )}
 
         {showDeleteConfirm && (
           <div className={styles.overlay}>
@@ -208,6 +236,18 @@ function AdminApp() {
               <div className={styles.dialogActions}>
                 <button className={styles.btnDialogYes} onClick={handleDeleteConfirm}>Yes</button>
                 <button className={styles.btnDialogNo} onClick={() => setShowDeleteConfirm(false)}>No</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showStopQueueConfirm && (
+          <div className={styles.overlay}>
+            <div className={styles.dialog}>
+              <p className={styles.dialogTitle}>Are you sure you want to stop the queue window?</p>
+              <div className={styles.dialogActions}>
+                <button className={styles.btnDialogYes} onClick={handleStopQueueConfirm}>Yes</button>
+                <button className={styles.btnDialogNo} onClick={() => setShowStopQueueConfirm(false)}>No</button>
               </div>
             </div>
           </div>
