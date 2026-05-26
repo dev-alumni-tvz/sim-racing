@@ -46,10 +46,18 @@ export default function App() {
 }
 
 function AdminApp() {
-  const { seconds, start, pause, reset, addTime } = useTimerStore()
+  const { seconds, start, pause, reset, expire, addTime } = useTimerStore()
   const now = useClock()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showStopQueueConfirm, setShowStopQueueConfirm] = useState(false)
+  const [localWindowEnd, setLocalWindowEnd] = useState<Date | null>(() => {
+    try {
+      const s = sessionStorage.getItem('sim_wend')
+      if (!s) return null
+      const d = new Date(s)
+      return d.getTime() > Date.now() ? d : null
+    } catch { return null }
+  })
   const autoStopFired = useRef(false)
 
   const simMode = SIM_MODE ? 'sim' : VISUAL_MODE ? 'visual' : 'off'
@@ -116,13 +124,18 @@ function AdminApp() {
     if (DEMO_MODE || !activeSession) return
     cancelSessionMutation.mutate(activeSession.sessionId)
     setShowDeleteConfirm(false)
-    pause()
-    reset()
+    autoStopFired.current = true
+    expire()
   }
 
   function handleStopQueueConfirm() {
     if (DEMO_MODE) return
-    stopQueueMutation.mutate()
+    stopQueueMutation.mutate(undefined, {
+      onSuccess: () => {
+        setLocalWindowEnd(null)
+        try { sessionStorage.removeItem('sim_wend') } catch {}
+      },
+    })
     startQueueMutation.reset()
     setShowStopQueueConfirm(false)
   }
@@ -142,8 +155,11 @@ function AdminApp() {
   const monitorSrc = DEMO_MODE ? `${monitorBase}?visual=1` : monitorBase
 
   const windowCountdownLabel = windowActive ? 'Queue ends in:' : 'Next queue in:'
-  const windowCountdownValue = windowActive && queueWindow
-    ? formatWindowCountdown(queueWindow.timeRemainingSeconds)
+  const windowCountdownSeconds = localWindowEnd
+    ? Math.max(0, Math.floor((localWindowEnd.getTime() - now.getTime()) / 1000))
+    : null
+  const windowCountdownValue = windowCountdownSeconds !== null
+    ? formatWindowCountdown(windowCountdownSeconds)
     : '—'
 
   return (
@@ -198,7 +214,16 @@ function AdminApp() {
           <div className={styles.actionRow}>
             <button
               className={styles.btnNextPlayer}
-              onClick={() => !DEMO_MODE && startQueueMutation.mutate()}
+              onClick={() => {
+                if (DEMO_MODE) return
+                startQueueMutation.mutate(undefined, {
+                  onSuccess: () => {
+                    const end = new Date(Date.now() + 60 * 60 * 1000)
+                    setLocalWindowEnd(end)
+                    try { sessionStorage.setItem('sim_wend', end.toISOString()) } catch {}
+                  },
+                })
+              }}
               disabled={DEMO_MODE || startQueueMutation.isPending}
             >
               START QUEUE
