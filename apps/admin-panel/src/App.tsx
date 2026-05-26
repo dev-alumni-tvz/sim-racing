@@ -50,6 +50,7 @@ function AdminApp() {
   const now = useClock()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showStopQueueConfirm, setShowStopQueueConfirm] = useState(false)
+  const [stopQueuePassword, setStopQueuePassword] = useState('')
   const [localWindowEnd, setLocalWindowEnd] = useState<Date | null>(() => {
     try {
       const s = sessionStorage.getItem('sim_wend')
@@ -144,6 +145,7 @@ function AdminApp() {
     })
     startQueueMutation.reset()
     setShowStopQueueConfirm(false)
+    setStopQueuePassword('')
   }
 
   // Reset the guard whenever the timer is running above zero
@@ -224,7 +226,7 @@ function AdminApp() {
                 if (DEMO_MODE) return
                 startQueueMutation.mutate(undefined, {
                   onSuccess: () => {
-                    const end = new Date(Date.now() + 60 * 60 * 1000)
+                    const end = new Date(Date.now() + 1 * 60 * 1000)
                     setLocalWindowEnd(end)
                     try { sessionStorage.setItem('sim_wend', end.toISOString()) } catch {}
                   },
@@ -283,19 +285,37 @@ function AdminApp() {
         {showStopQueueConfirm && (
           <div className={styles.overlay}>
             <div className={styles.dialog}>
-              <p className={styles.dialogTitle}>Are you sure you want to stop the queue window?</p>
+              <p className={styles.dialogTitle}>Enter password to close the queue window.</p>
+              <input
+                className={styles.input}
+                type="password"
+                autoFocus
+                placeholder="••••"
+                value={stopQueuePassword}
+                onChange={(e) => setStopQueuePassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && stopQueuePassword === 'STOP') handleStopQueueConfirm()
+                  if (e.key === 'Escape') { setShowStopQueueConfirm(false); setStopQueuePassword('') }
+                }}
+              />
               <div className={styles.dialogActions}>
-                <button className={styles.btnDialogYes} onClick={handleStopQueueConfirm}>Yes</button>
-                <button className={styles.btnDialogNo} onClick={() => setShowStopQueueConfirm(false)}>No</button>
+                <button
+                  className={styles.btnDialogYes}
+                  onClick={handleStopQueueConfirm}
+                  disabled={stopQueuePassword !== 'STOP'}
+                >
+                  Yes
+                </button>
+                <button className={styles.btnDialogNo} onClick={() => { setShowStopQueueConfirm(false); setStopQueuePassword('') }}>No</button>
               </div>
             </div>
           </div>
         )}
 
         <QueuePanel
-          queueEntries={queueEntries}
+          queueEntries={!DEMO_MODE && !windowActive ? [] : queueEntries}
           activeSession={activeSession}
-          playedEntries={simData?.playedEntries}
+          playedEntries={!DEMO_MODE && !windowActive ? [] : simData?.playedEntries}
           onDeleteSession={() => setShowDeleteConfirm(true)}
         />
       </main>
