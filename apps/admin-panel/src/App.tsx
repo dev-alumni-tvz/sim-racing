@@ -46,7 +46,7 @@ export default function App() {
 }
 
 function AdminApp() {
-  const { seconds, start, pause, reset, expire, addTime } = useTimerStore()
+  const { seconds, start, pause, reset, addTime } = useTimerStore()
   const now = useClock()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showStopQueueConfirm, setShowStopQueueConfirm] = useState(false)
@@ -71,7 +71,7 @@ function AdminApp() {
 
   const queueEntries = simData?.queueEntries ?? liveQueue
   const deletedIds = new Set(liveQueue.filter(e => e.status === 'deleted').map(e => e.attendeeId))
-  const leaderboardRows = (simData?.leaderboardRows ?? liveLeaderboard).filter(r => !deletedIds.has(r.attendeeId))
+  const leaderboardRows = simData?.leaderboardRows ?? liveLeaderboard.filter(r => !deletedIds.has(r.attendeeId))
   const activeSession = simData?.activeSession ?? liveSession ?? null
   const displaySeconds = simData?.timerSeconds ?? seconds
   const isPaused = activeSession?.isPaused ?? false
@@ -313,7 +313,7 @@ function AdminApp() {
         )}
 
         <QueuePanel
-          queueEntries={!DEMO_MODE && !windowActive ? [] : queueEntries}
+          queueEntries={queueEntries}
           activeSession={activeSession}
           playedEntries={!DEMO_MODE && !windowActive ? [] : simData?.playedEntries}
           onDeleteSession={() => setShowDeleteConfirm(true)}
