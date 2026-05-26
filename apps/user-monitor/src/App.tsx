@@ -21,7 +21,16 @@ export default function App() {
 	const { rows: simRows, queue: simQueue } = useSimulation(SIM_MODE);
 
 	const rows = SIM_MODE ? simRows : liveRows;
-	const queue = SIM_MODE ? simQueue : liveQueue;
+	const rawQueue = SIM_MODE ? simQueue : liveQueue;
+
+	const windowActive = SIM_MODE || VISUAL_MODE || (queueWindow?.isActive ?? false);
+	const queue = windowActive ? rawQueue : {
+		...rawQueue,
+		currentDriver: null,
+		nextDriver: null,
+		previousDriver: null,
+		waitingQueue: [],
+	};
 
 	const top3 = rows.filter((r) => r.isTop3);
 	const rest = rows.filter((r) => !r.isTop3);
