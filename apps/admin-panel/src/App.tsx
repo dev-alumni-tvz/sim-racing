@@ -226,7 +226,7 @@ function AdminApp() {
                 if (DEMO_MODE) return
                 startQueueMutation.mutate(undefined, {
                   onSuccess: () => {
-                    const end = new Date(Date.now() + 1 * 60 * 1000)
+                    const end = new Date(Date.now() + 60 * 60 * 1000)
                     setLocalWindowEnd(end)
                     try { sessionStorage.setItem('sim_wend', end.toISOString()) } catch {}
                   },
