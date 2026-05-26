@@ -3,7 +3,6 @@ import { useLeaderboardRaw, type PlayedEntry } from '../hooks/useLeaderboardRaw'
 import {
   useEditAttendee,
   useDeleteAttendee,
-  useSkipAttendee,
   useEditLeaderboardEntry,
   useDeleteLeaderboardEntry,
   useReorderQueue,
@@ -51,7 +50,6 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
 
   const editAttendee = useEditAttendee()
   const deleteAttendee = useDeleteAttendee()
-  const skipAttendee = useSkipAttendee()
   const editLeaderboard = useEditLeaderboardEntry()
   const deleteLeaderboard = useDeleteLeaderboardEntry()
   const reorderQueue = useReorderQueue()
@@ -228,13 +226,10 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
                     { onSuccess: () => setModal(null) }
                   )
                 }
-                onSkip={() =>
-                  skipAttendee.mutate(modal.entry.attendeeId, { onSuccess: () => setModal(null) })
-                }
                 onDelete={() =>
                   deleteAttendee.mutate(modal.entry.attendeeId, { onSuccess: () => setModal(null) })
                 }
-                isPending={editAttendee.isPending || skipAttendee.isPending || deleteAttendee.isPending}
+                isPending={editAttendee.isPending || deleteAttendee.isPending}
               />
             ) : (
               <LeaderboardEditForm
@@ -263,14 +258,12 @@ function QueueEditForm({
   entry,
   onClose,
   onSave,
-  onSkip,
   onDelete,
   isPending,
 }: {
   entry: QueueEntry
   onClose: () => void
   onSave: (body: { firstName: string; lastName: string; email: string }) => void
-  onSkip: () => void
   onDelete: () => void
   isPending: boolean
 }) {
@@ -297,9 +290,6 @@ function QueueEditForm({
           disabled={isPending}
         >
           Spremi
-        </button>
-        <button className={styles.btnSkip} onClick={onSkip} disabled={isPending}>
-          Skip
         </button>
         <button className={styles.btnDelete} onClick={onDelete} disabled={isPending}>
           Izbriši
