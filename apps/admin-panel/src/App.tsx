@@ -5,7 +5,7 @@ import { useTimerStore, formatTime } from './timerStore'
 import { useLeaderboard } from './hooks/useLeaderboard'
 import { useAdminQueue } from './hooks/useAdminQueue'
 import { useActiveSession } from './hooks/useActiveSession'
-import { useStartSession, useStopSession, usePauseSession, useResumeSession, useCancelSession } from './hooks/useSessionMutations'
+import { useStartSession, useStopSession, usePauseSession, useResumeSession, useDeleteAttendee } from './hooks/useSessionMutations'
 import { useQueueWindow, useStartQueueWindow, useStopQueueWindow } from './hooks/useQueueWindow'
 import { useAdminSimulation } from './hooks/useAdminSimulation'
 import { QueuePanel } from './components/QueuePanel'
@@ -68,8 +68,9 @@ function AdminApp() {
   const { data: liveSession } = useActiveSession(!DEMO_MODE)
   const { data: queueWindow, isPending: windowPending } = useQueueWindow(!DEMO_MODE)
 
-  const leaderboardRows = simData?.leaderboardRows ?? liveLeaderboard
   const queueEntries = simData?.queueEntries ?? liveQueue
+  const deletedIds = new Set(liveQueue.filter(e => e.status === 'deleted').map(e => e.attendeeId))
+  const leaderboardRows = (simData?.leaderboardRows ?? liveLeaderboard).filter(r => !deletedIds.has(r.attendeeId))
   const activeSession = simData?.activeSession ?? liveSession ?? null
   const displaySeconds = simData?.timerSeconds ?? seconds
   const isPaused = activeSession?.isPaused ?? false
@@ -80,18 +81,20 @@ function AdminApp() {
   const stopSessionMutation = useStopSession()
   const pauseSessionMutation = usePauseSession()
   const resumeSessionMutation = useResumeSession()
-  const cancelSessionMutation = useCancelSession()
+  const deleteAttendeeMutation = useDeleteAttendee()
   const startQueueMutation = useStartQueueWindow()
   const stopQueueMutation = useStopQueueWindow()
 
-  // windowActive: stays true from the moment START QUEUE is clicked (isPending)
-  // through the full session cycle (isSuccess) until STOP QUEUE is confirmed.
-  // The || !!activeSession guard covers page-reload recovery when a session is already live.
+  // windowActive: true while a queue window is open.
+  // isPending always bridges the click→response gap.
+  // isSuccess only counts while the API hasn't confirmed isActive:false — this
+  // prevents it from lingering after a natural timer expiry (unlike the STOP QUEUE
+  // path which calls startQueueMutation.reset() explicitly).
   const windowActive = DEMO_MODE
-    || (queueWindow?.isActive ?? false)
-    || !!activeSession
+    || (queueWindow?.isActive === true)
     || startQueueMutation.isPending
-    || startQueueMutation.isSuccess
+    || (startQueueMutation.isSuccess && queueWindow?.isActive !== false)
+    || !!activeSession
 
   function handleNextPlayer() {
     if (DEMO_MODE) return
@@ -122,10 +125,13 @@ function AdminApp() {
 
   function handleDeleteConfirm() {
     if (DEMO_MODE || !activeSession) return
-    cancelSessionMutation.mutate(activeSession.sessionId)
+    const attendeeId = activeSession.attendeeId
+    stopSessionMutation.mutate(undefined, {
+      onSuccess: () => deleteAttendeeMutation.mutate(attendeeId),
+    })
     setShowDeleteConfirm(false)
     autoStopFired.current = true
-    expire()
+    reset()
   }
 
   function handleStopQueueConfirm() {

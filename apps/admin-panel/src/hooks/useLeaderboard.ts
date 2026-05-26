@@ -7,6 +7,7 @@ import { fetchLeaderboard } from '../services/leaderboard'
 function transform(data: LeaderboardResponse) {
   const leaderMs = data.entries[0]?.bestLapMs ?? 0
   return data.entries.map((e) => ({
+    attendeeId: e.attendeeId,
     position: e.rank,
     name: fullName(e.firstName, e.lastName),
     lapTime: e.bestLapFormatted,

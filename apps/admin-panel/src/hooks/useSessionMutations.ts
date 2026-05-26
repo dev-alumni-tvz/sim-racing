@@ -50,7 +50,8 @@ export function useStopSession() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: stopSession,
-    onMutate: () => {
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ['activeSession'] })
       qc.setQueryData(['activeSession'], null)
     },
     onSuccess: () => {
@@ -94,7 +95,9 @@ export function useCancelSession() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (sessionId: string) => cancelSession(sessionId),
-    onMutate: () => {
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ['activeSession'] })
+      await qc.cancelQueries({ queryKey: ['adminQueue'] })
       qc.setQueryData(['activeSession'], null)
     },
     onSuccess: () => {
@@ -103,6 +106,7 @@ export function useCancelSession() {
     },
     onError: () => {
       qc.invalidateQueries({ queryKey: ['activeSession'] })
+      qc.invalidateQueries({ queryKey: ['adminQueue'] })
     },
   })
 }
@@ -120,7 +124,10 @@ export function useDeleteAttendee() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (attendeeId: string) => deleteAttendee(attendeeId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['adminQueue'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['adminQueue'] })
+      qc.invalidateQueries({ queryKey: ['leaderboard'] })
+    },
   })
 }
 

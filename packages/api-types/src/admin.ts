@@ -1,5 +1,5 @@
 // GET /api/admin/queue — returns flat array
-export type AttendeeStatus = 'waiting' | 'driving' | 'done' | 'skipped'
+export type AttendeeStatus = 'waiting' | 'driving' | 'done' | 'skipped' | 'deleted'
 
 export interface AdminQueueEntry {
   attendeeId: string
