@@ -26,7 +26,7 @@ export function useQueueWindow(enabled = true) {
       return data
     },
     enabled,
-    refetchInterval: 1000,
+    refetchInterval: 2500,
     initialData: readCache,
   })
 }

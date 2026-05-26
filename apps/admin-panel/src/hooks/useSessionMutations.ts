@@ -12,15 +12,36 @@ import {
   deleteLeaderboardEntry,
   reorderQueuePositions,
 } from '../services/session'
-import type { EditAttendeeRequest, EditLeaderboardRequest, ReorderQueueRequest } from '@sim-racing/api-types'
+import type { AdminQueueEntry, ActiveSessionResponse, EditAttendeeRequest, EditLeaderboardRequest, ReorderQueueRequest } from '@sim-racing/api-types'
 
 export function useStartSession() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: startSession,
+    onMutate: (variables) => {
+      // Optimistically populate activeSession so windowActive stays true
+      // during the gap between mutation success and the refetch completing.
+      const queue = qc.getQueryData<AdminQueueEntry[]>(['adminQueue']) ?? []
+      const attendee = queue.find(e => e.attendeeId === variables.attendeeId)
+      if (attendee) {
+        qc.setQueryData<ActiveSessionResponse>(['activeSession'], {
+          sessionId: 'optimistic',
+          attendeeId: attendee.attendeeId,
+          ticketNumber: attendee.ticketNumber,
+          attendeeFirstName: attendee.firstName,
+          attendeeLastName: attendee.lastName,
+          startedAt: new Date().toISOString(),
+          isPaused: false,
+        })
+      }
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['activeSession'] })
       qc.invalidateQueries({ queryKey: ['adminQueue'] })
+    },
+    onError: () => {
+      qc.setQueryData(['activeSession'], null)
+      qc.invalidateQueries({ queryKey: ['activeSession'] })
     },
   })
 }

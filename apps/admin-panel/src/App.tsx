@@ -67,8 +67,6 @@ function AdminApp() {
   const isPaused = activeSession?.isPaused ?? false
   // windowLoaded: true immediately if cached (initialData hit) or in DEMO_MODE
   const windowLoaded = DEMO_MODE || !windowPending
-  // In DEMO_MODE always show action row (visual preview); otherwise use server state
-  const windowActive = DEMO_MODE || (queueWindow?.isActive ?? false)
 
   const startSessionMutation = useStartSession()
   const stopSessionMutation = useStopSession()
@@ -77,6 +75,15 @@ function AdminApp() {
   const cancelSessionMutation = useCancelSession()
   const startQueueMutation = useStartQueueWindow()
   const stopQueueMutation = useStopQueueWindow()
+
+  // windowActive: stays true from the moment START QUEUE is clicked (isPending)
+  // through the full session cycle (isSuccess) until STOP QUEUE is confirmed.
+  // The || !!activeSession guard covers page-reload recovery when a session is already live.
+  const windowActive = DEMO_MODE
+    || (queueWindow?.isActive ?? false)
+    || !!activeSession
+    || startQueueMutation.isPending
+    || startQueueMutation.isSuccess
 
   function handleNextPlayer() {
     if (DEMO_MODE) return
@@ -116,6 +123,7 @@ function AdminApp() {
   function handleStopQueueConfirm() {
     if (DEMO_MODE) return
     stopQueueMutation.mutate()
+    startQueueMutation.reset()
     setShowStopQueueConfirm(false)
   }
 
