@@ -2,6 +2,7 @@
 export interface LeaderboardEntry {
   rank: number
   attendeeId: string
+  sessionId: string
   ticketNumber: string
   firstName: string
   lastName: string

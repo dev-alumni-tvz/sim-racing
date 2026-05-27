@@ -342,7 +342,7 @@ Figma MCP is configured in `~/.claude/.mcp.json`. Claude Code can read Figma des
 { "bestLapMs": 0 }
 ```
 
-Note: `sessionId` and `attendeeId` are separate UUIDs. The leaderboard PUT/DELETE endpoints use `attendeeId` as the path param, not `sessionId`.
+Note: `sessionId` and `attendeeId` are separate UUIDs. The leaderboard PUT/DELETE endpoints use `sessionId` as the path param. `GET /api/leaderboard` includes `sessionId` on each entry so the frontend can call these endpoints.
 
 ---
 

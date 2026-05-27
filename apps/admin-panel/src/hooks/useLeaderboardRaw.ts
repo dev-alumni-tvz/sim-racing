@@ -13,6 +13,7 @@ function transform(data: LeaderboardResponse) {
     .map((e, idx) => ({
       playOrder: idx + 1,
       attendeeId: e.attendeeId,
+      sessionId: e.sessionId,
       ticketNumber: e.ticketNumber,
       name: fullName(e.firstName, e.lastName),
       firstName: e.firstName,

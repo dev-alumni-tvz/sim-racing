@@ -134,8 +134,8 @@ export function useDeleteAttendee() {
 export function useEditLeaderboardEntry() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ attendeeId, body }: { attendeeId: string; body: EditLeaderboardRequest }) =>
-      editLeaderboardEntry(attendeeId, body),
+    mutationFn: ({ attendeeId: sessionId, body }: { attendeeId: string; body: EditLeaderboardRequest }) =>
+      editLeaderboardEntry(sessionId, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['leaderboard'] }),
   })
 }
@@ -143,7 +143,7 @@ export function useEditLeaderboardEntry() {
 export function useDeleteLeaderboardEntry() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (attendeeId: string) => deleteLeaderboardEntry(attendeeId),
+    mutationFn: (sessionId: string) => deleteLeaderboardEntry(sessionId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['leaderboard'] }),
   })
 }

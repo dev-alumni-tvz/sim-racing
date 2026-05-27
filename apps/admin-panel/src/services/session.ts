@@ -59,15 +59,15 @@ export function deleteAttendee(attendeeId: string): Promise<void> {
   return apiFetch<void>(`/api/admin/attendee/${attendeeId}`, { method: 'DELETE' })
 }
 
-export function editLeaderboardEntry(attendeeId: string, body: EditLeaderboardRequest): Promise<void> {
-  return apiFetch<void>(`/api/admin/leaderboard/${attendeeId}`, {
+export function editLeaderboardEntry(sessionId: string, body: EditLeaderboardRequest): Promise<void> {
+  return apiFetch<void>(`/api/admin/leaderboard/${sessionId}`, {
     method: 'PUT',
     body: JSON.stringify(body),
   })
 }
 
-export function deleteLeaderboardEntry(attendeeId: string): Promise<void> {
-  return apiFetch<void>(`/api/admin/leaderboard/${attendeeId}`, { method: 'DELETE' })
+export function deleteLeaderboardEntry(sessionId: string): Promise<void> {
+  return apiFetch<void>(`/api/admin/leaderboard/${sessionId}`, { method: 'DELETE' })
 }
 
 export function reorderQueuePositions(body: ReorderQueueRequest): Promise<void> {

@@ -237,12 +237,12 @@ export function QueuePanel({ queueEntries, activeSession, playedEntries: propPla
                 onClose={() => setModal(null)}
                 onSave={(bestLapMs) =>
                   editLeaderboard.mutate(
-                    { attendeeId: modal.entry.attendeeId, body: { bestLapMs } },
+                    { attendeeId: modal.entry.sessionId, body: { bestLapMs } },
                     { onSuccess: () => setModal(null) }
                   )
                 }
                 onDelete={() =>
-                  deleteLeaderboard.mutate(modal.entry.attendeeId, { onSuccess: () => setModal(null) })
+                  deleteLeaderboard.mutate(modal.entry.sessionId, { onSuccess: () => setModal(null) })
                 }
                 isPending={editLeaderboard.isPending || deleteLeaderboard.isPending}
               />
