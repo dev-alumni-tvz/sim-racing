@@ -28,8 +28,8 @@ export const JoinQueueModal: FC<Props> = ({ onClose, onSuccess }) => {
     return () => { document.body.style.overflow = '' }
   }, [])
 
-  // const emailValid = email.toLowerCase().endsWith('@tvz.hr')
-  const emailValid = email.trim().length > 0
+  const emailNorm = email.trim().toLowerCase()
+  const emailValid = emailNorm.endsWith('@tvz.hr') || emailNorm === 'dev@alumni-tvz.hr'
   const canSubmit =
     firstName.trim().length > 0 && lastName.trim().length > 0 && emailValid
 
@@ -39,7 +39,7 @@ export const JoinQueueModal: FC<Props> = ({ onClose, onSuccess }) => {
       {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        email: email.trim().toLowerCase(),
+        email: emailNorm,
       },
       {
         onSuccess: (data) => onSuccess(data, firstName.trim(), lastName.trim()),
@@ -98,9 +98,9 @@ export const JoinQueueModal: FC<Props> = ({ onClose, onSuccess }) => {
               onChange={(e) => setEmail(e.target.value)}
               disabled={registration.isPending}
             />
-            {/* {email && !emailValid && (
+            {email && !emailValid && (
               <span className={styles.fieldError}>Email mora završavati na @tvz.hr</span>
-            )} */}
+            )}
           </div>
         </div>
 
