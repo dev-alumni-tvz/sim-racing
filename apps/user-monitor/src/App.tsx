@@ -73,11 +73,13 @@ export default function App() {
 	const podiumSecond = top3[1] ? { name: top3[1].name, lapTime: top3[1].lapTime, gap: top3[1].gap ?? undefined } : EMPTY;
 	const podiumThird  = top3[2] ? { name: top3[2].name, lapTime: top3[2].lapTime, gap: top3[2].gap ?? undefined } : EMPTY;
 
-	const MIN_ROWS = 8;
+	const MIN_ROWS = 10;
+	const MAX_ROWS = 10; // show positions 4–13 only
+	const restCapped = rest.slice(0, MAX_ROWS);
 	const nextPosition = Math.max(4, top3.length + rest.length + 1);
-	const leaderboardRows = rest.length >= MIN_ROWS ? rest : [
-		...rest,
-		...Array.from({ length: MIN_ROWS - rest.length }, (_, i) => ({
+	const leaderboardRows = restCapped.length >= MIN_ROWS ? restCapped : [
+		...restCapped,
+		...Array.from({ length: MIN_ROWS - restCapped.length }, (_, i) => ({
 			position: nextPosition + i,
 			name: '—',
 			lapTime: '--:--.---',
