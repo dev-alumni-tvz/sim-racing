@@ -51,14 +51,6 @@ function AdminApp() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showStopQueueConfirm, setShowStopQueueConfirm] = useState(false)
   const [stopQueuePassword, setStopQueuePassword] = useState('')
-  const [localWindowEnd, setLocalWindowEnd] = useState<Date | null>(() => {
-    try {
-      const s = sessionStorage.getItem('sim_wend')
-      if (!s) return null
-      const d = new Date(s)
-      return d.getTime() > Date.now() ? d : null
-    } catch { return null }
-  })
   const autoStopFired = useRef(false)
 
   const simMode = SIM_MODE ? 'sim' : VISUAL_MODE ? 'visual' : 'off'
@@ -68,6 +60,20 @@ function AdminApp() {
   const { data: liveQueue = [] } = useAdminQueue(!DEMO_MODE)
   const { data: liveSession } = useActiveSession(!DEMO_MODE)
   const { data: queueWindow, isPending: windowPending } = useQueueWindow(!DEMO_MODE)
+
+  // Local countdown that ticks every second and resyncs from API on each poll.
+  // This keeps the display smooth between 2.5s polls without drifting from the server.
+  const [countdownSecs, setCountdownSecs] = useState<number>(0)
+  useEffect(() => {
+    if (queueWindow?.timeRemainingSeconds !== undefined) {
+      setCountdownSecs(queueWindow.timeRemainingSeconds)
+    }
+  }, [queueWindow?.timeRemainingSeconds])
+  useEffect(() => {
+    if (!queueWindow?.isActive) return
+    const id = setInterval(() => setCountdownSecs(s => Math.max(0, s - 1)), 1000)
+    return () => clearInterval(id)
+  }, [queueWindow?.isActive])
 
   const queueEntries = simData?.queueEntries ?? liveQueue
   const deletedIds = new Set(liveQueue.filter(e => e.status === 'deleted').map(e => e.attendeeId))
@@ -137,12 +143,7 @@ function AdminApp() {
 
   function handleStopQueueConfirm() {
     if (DEMO_MODE) return
-    stopQueueMutation.mutate(undefined, {
-      onSuccess: () => {
-        setLocalWindowEnd(null)
-        try { sessionStorage.removeItem('sim_wend') } catch {}
-      },
-    })
+    stopQueueMutation.mutate()
     startQueueMutation.reset()
     setShowStopQueueConfirm(false)
     setStopQueuePassword('')
@@ -163,11 +164,8 @@ function AdminApp() {
   const monitorSrc = DEMO_MODE ? `${monitorBase}?visual=1` : monitorBase
 
   const windowCountdownLabel = windowActive ? 'Queue ends in:' : 'Next queue in:'
-  const windowCountdownSeconds = localWindowEnd
-    ? Math.max(0, Math.floor((localWindowEnd.getTime() - now.getTime()) / 1000))
-    : null
-  const windowCountdownValue = windowCountdownSeconds !== null
-    ? formatWindowCountdown(windowCountdownSeconds)
+  const windowCountdownValue = queueWindow?.isActive
+    ? formatWindowCountdown(countdownSecs)
     : '—'
 
   return (
@@ -224,13 +222,7 @@ function AdminApp() {
               className={styles.btnNextPlayer}
               onClick={() => {
                 if (DEMO_MODE) return
-                startQueueMutation.mutate(undefined, {
-                  onSuccess: () => {
-                    const end = new Date(Date.now() + 60 * 60 * 1000)
-                    setLocalWindowEnd(end)
-                    try { sessionStorage.setItem('sim_wend', end.toISOString()) } catch {}
-                  },
-                })
+                startQueueMutation.mutate()
               }}
               disabled={DEMO_MODE || startQueueMutation.isPending}
             >
