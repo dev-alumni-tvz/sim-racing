@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import styles from './App.module.css';
 import { LeaderboardTable, PlayerCard, PodiumTop3, QueueDisplay } from '@sim-racing/ui';
 import { useLeaderboard } from './hooks/useLeaderboard';
@@ -15,13 +16,43 @@ function formatSeconds(s: number): string {
 }
 
 export default function App() {
-	const { data: liveRows } = useLeaderboard(!SIM_MODE, VISUAL_MODE);
+	const { data: liveData } = useLeaderboard(!SIM_MODE, VISUAL_MODE);
 	const { data: liveQueue } = useQueueDisplay(!SIM_MODE, VISUAL_MODE);
 	const { data: queueWindow } = useQueueWindow(!SIM_MODE && !VISUAL_MODE);
 	const { rows: simRows, queue: simQueue } = useSimulation(SIM_MODE);
 
-	const rows = SIM_MODE ? simRows : liveRows;
+	// Local countdown that ticks every second and resyncs from API on each poll.
+	const [countdownSecs, setCountdownSecs] = useState<number>(0);
+	useEffect(() => {
+		if (queueWindow?.timeRemainingSeconds !== undefined) {
+			setCountdownSecs(queueWindow.timeRemainingSeconds);
+		}
+	}, [queueWindow?.timeRemainingSeconds]);
+	useEffect(() => {
+		if (!queueWindow?.isActive) return;
+		const id = setInterval(() => setCountdownSecs(s => Math.max(0, s - 1)), 1000);
+		return () => clearInterval(id);
+	}, [queueWindow?.isActive]);
+
+	const rows = SIM_MODE ? simRows : liveData.rows;
 	const rawQueue = SIM_MODE ? simQueue : liveQueue;
+
+	// Total occupied slots = waiting + currently driving + finished this window
+	// Filter by windowStartedAt so queue 2 doesn't inherit queue 1's done count
+	const MAX_QUEUE = 15;
+	const windowStart = queueWindow?.windowStartedAt ? new Date(queueWindow.windowStartedAt) : null;
+	const doneThisWindowCount = SIM_MODE ? 0 : liveData.completions.filter(
+		(c) => windowStart && new Date(c.completedAt) >= windowStart
+	).length;
+	const drivingCount = rawQueue.currentDriver ? 1 : 0;
+	const totalOccupied = (rawQueue.waitingCount ?? 0) + drivingCount + doneThisWindowCount;
+	const freeSlots = Math.max(0, MAX_QUEUE - totalOccupied);
+	const newSlotsAt = queueWindow?.windowEndsAt
+		? (() => {
+			const d = new Date(queueWindow.windowEndsAt!)
+			return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}H`
+		})()
+		: rawQueue.newSlotsAt;
 
 	const windowActive = SIM_MODE || VISUAL_MODE || (queueWindow?.isActive ?? false);
 	const queue = windowActive ? rawQueue : {
@@ -73,7 +104,7 @@ export default function App() {
 						first={podiumFirst}
 						second={podiumSecond}
 						third={podiumThird}
-						queueEndsText={queueWindow?.isActive ? formatSeconds(queueWindow.timeRemainingSeconds) : '—'}
+						queueEndsText={queueWindow?.isActive ? formatSeconds(countdownSecs) : '—'}
 					/>
 					<div className={styles.podiumDivider} />
 				</section>
@@ -114,8 +145,8 @@ export default function App() {
 					<QueueDisplay
 						showAsGrid
 						waitingQueue={queue.waitingQueue}
-						freeSlots={queue.freeSlots}
-						newSlotsAt={queue.newSlotsAt}
+						freeSlots={freeSlots}
+						newSlotsAt={newSlotsAt}
 					/>
 				</section>
 			</main>

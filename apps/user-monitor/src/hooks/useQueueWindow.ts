@@ -17,7 +17,7 @@ export function useQueueWindow(enabled = true) {
     queryKey: ['queueWindow'],
     queryFn: fetchQueueWindow,
     enabled,
-    refetchInterval: 1000,
+    refetchInterval: 2500,
     select: (data) => {
       last.current = data
       return data
