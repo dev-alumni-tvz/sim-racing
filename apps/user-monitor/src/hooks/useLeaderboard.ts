@@ -29,8 +29,9 @@ const VISUAL_PLACEHOLDER: LeaderboardResponse = {
 }
 
 function transform(data: LeaderboardResponse) {
-  const leaderMs = data.entries[0]?.bestLapMs ?? 0
-  const rows = data.entries.map((e) => ({
+  const sorted = [...data.entries].sort((a, b) => a.rank - b.rank)
+  const leaderMs = sorted[0]?.bestLapMs ?? 0
+  const rows = sorted.map((e) => ({
     position: e.rank,
     name: fullName(e.firstName, e.lastName),
     lapTime: e.bestLapFormatted,
@@ -38,7 +39,7 @@ function transform(data: LeaderboardResponse) {
     isTop3: e.rank <= 3,
   }))
   // Keep raw completedAt timestamps so callers can filter by queue window
-  const completions: { completedAt: string }[] = data.entries.map((e) => ({
+  const completions: { completedAt: string }[] = sorted.map((e) => ({
     completedAt: e.completedAt,
   }))
   return { rows, completions }
