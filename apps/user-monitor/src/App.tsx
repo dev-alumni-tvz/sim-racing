@@ -55,12 +55,14 @@ export default function App() {
 		: rawQueue.newSlotsAt;
 
 	const windowActive = SIM_MODE || VISUAL_MODE || (queueWindow?.isActive ?? false);
+	// Always show the waiting queue so registered people are visible even before
+	// the window opens. Only hide the driver cards (current/next/previous) when
+	// the window is inactive, since those only apply during an active session.
 	const queue = windowActive ? rawQueue : {
 		...rawQueue,
 		currentDriver: null,
 		nextDriver: null,
 		previousDriver: null,
-		waitingQueue: [],
 	};
 
 	const top3 = rows.filter((r) => r.isTop3);
