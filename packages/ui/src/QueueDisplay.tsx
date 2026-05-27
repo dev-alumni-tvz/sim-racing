@@ -49,7 +49,7 @@ export const QueueDisplay: FC<QueueDisplayProps> = ({
 
   return (
     <div className={styles.grid}>
-      {waitingQueue.slice(0, 10).map((slot) => (
+      {waitingQueue.map((slot) => (
         <div key={slot.ticketNumber} className={styles.tile}>
           <span className={styles.tileNumber}>{formatTicket(slot.ticketNumber)}</span>
         </div>
